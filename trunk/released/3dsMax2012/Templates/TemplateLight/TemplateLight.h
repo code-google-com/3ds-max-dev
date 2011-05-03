@@ -1,0 +1,271 @@
+//
+// Copyright 2009 Autodesk, Inc.  All rights reserved.
+//
+// Use of this software is subject to the terms of the Autodesk license
+// agreement provided at the time of installation or download, or which
+// otherwise accompanies this software in either electronic or hard copy form.  
+//
+
+#pragma once
+
+#include "resource.h"
+#include "../../Shared/Common.h"
+#include "../../Shared/ObjectPlugin.h"
+
+//============================================================
+// Class descriptor declaration
+
+class TemplateLightClassDesc
+    : public ClassDesc2 
+{
+public: 
+    //---------------------------------------
+    // ClassDesc2 overrides 
+
+    virtual int IsPublic();
+    virtual void* Create(BOOL loading = FALSE);
+    virtual const MCHAR* ClassName();
+    virtual SClass_ID SuperClassID();
+    virtual Class_ID ClassID();
+    virtual const MCHAR* Category();
+    virtual const MCHAR* GetInternalName();
+    virtual HINSTANCE HInstance();
+
+    //---------------------------------------
+    // Returns a singleton instance of the class descriptor
+    static ClassDesc2* GetClassDescInstance();
+}; 
+
+//============================================================
+// The plug-in definition
+
+class TemplateLight 
+    : public ObjectPlugin<LightObject>
+{
+    //============================================================
+    // Fields
+
+    // Use member fields only when data is not managed by the parameter block
+    // or the reference manager. 
+    TODO("Add member fields");
+
+    //============================================================
+    // Identifiers for chunks when loading and saving
+
+    TODO("Add your own chunk ids");
+
+    static const int TemplateLightHeaderChunkID = 1;
+
+public:
+   
+    //============================================================
+    // Parameter IDs 
+
+    TODO("Replace these with your own parameter IDs");
+
+    static const ParamID FLOAT_PARAM_ID = 0;
+    static const ParamID NODE_PARAM_ID = 1;
+
+    //============================================================
+    // Constructor/destructor
+
+    TemplateLight()
+		: ObjectPlugin<LightObject>(TemplateLightClassDesc::GetClassDescInstance())
+    {         
+        TODO("Initialize any member fields");
+
+        // Register references. Note that the parameter block is already registered as a reference 
+        // by the PluginBase class
+        TODO("Call RegisterReference() for any references you want managed automatically");
+
+        // Register sub-anims. All sub-anims must first be registered as references. Note that the 
+        // parameter block is already registered as a reference by the PluginBase class
+        TODO("Call RegisterSubAnim() for any managed references which are also sub-animatables");
+
+        // Ask the class descriptor to make the parameter blocks
+        // This will trigger 3ds Max to call ReplaceReference with the 
+        // constructed parameter block 
+        GetClassDesc()->MakeAutoParamBlocks(this);
+    }
+
+    ~TemplateLight()
+    { 
+        TODO("Free any memory allocated here");
+    }
+
+    //============================================================
+    // Animatable overrides 
+
+    IOResult Save(ISave *isave) 
+    { 
+	    IOResult res;
+	    isave->BeginChunk(TemplateLightHeaderChunkID);
+        
+        TODO("Save any member fields");
+
+        res = ObjectPlugin<LightObject>::Save(isave);
+	    if (res != IO_OK) return res;
+	    isave->EndChunk();
+	    return IO_OK;
+	}	
+
+    IOResult Load(ILoad *iload) 
+    { 
+	    IOResult res = IO_OK;
+	    
+        while (iload->OpenChunk() == IO_OK) 
+        {
+            int id = iload->CurChunkID();
+		    switch(id)  
+            {
+			    case TemplateLightHeaderChunkID:
+        
+                    TODO("Load any member fields");
+
+                    res = ObjectPlugin<LightObject>::Load(iload);
+				    break;
+			}
+		    iload->CloseChunk();
+		
+            if (res != IO_OK) 
+			    return res;
+		}        
+
+	    return IO_OK;
+	}
+
+    //============================================================
+    // RefMaker overrides 
+
+    // Do not call this function directly, it is for use by 3ds Max
+    // If you wish to clone a plug-in you should use CloneRefHierarchy()
+    virtual RefTargetHandle Clone(RemapDir& remap) 
+    {
+        ReferenceTarget* r = new TemplateLight();
+        BaseClone(this, r, remap);
+        return r;
+    }
+
+    // Called automatically by SafeClone()
+    virtual void BaseClone(ReferenceTarget* from, ReferenceTarget* to, RemapDir& remap)  
+    {
+        // Don't copy to or from a NULL pointer
+        // and don't copy of the source and destination is the same
+        if (!from || !to || from == to)
+            return;
+
+        // Cast to the correct types
+        TemplateLight* source = dynamic_cast<TemplateLight*>(from);
+        TemplateLight* target = dynamic_cast<TemplateLight*>(to);
+        
+        DbgAssert(source != NULL && "The source is not the expected type");
+        DbgAssert(target != NULL && "The target is not the expected type");
+
+        // Note: the reference manager automatically clones all references for us
+        TODO("Copy any data fields from the source to the target");
+                
+        ObjectPlugin<LightObject>::BaseClone(from, to, remap);
+    }
+
+    //=========================================================================
+    // ObjectPlugin<LightObject> overrides 
+
+    virtual void BuildMesh(TimeValue t, Mesh& m) 
+    {
+        TODO("Build the mesh object");
+    }
+    virtual RefResult EvalLightState (TimeValue time, Interval &valid, LightState *ls)
+    {
+        TODO("Updated the passed LightState and validity interval");
+        return REF_SUCCEED;
+    }
+    virtual void SetUseLight(int onOff)
+    {
+        TODO("Turn the light on or off");
+    }
+    virtual BOOL GetUseLight()
+    {
+        TODO("Return TRUE or FALSE depending on whether the light is on or off");
+        return TRUE;
+    }
+    virtual void SetHotspot (TimeValue time, float f)
+    {
+        TODO("Set the hot spot to the specified angle");
+    }
+    virtual float GetHotspot(TimeValue t, Interval &valid=Interval(0, 0))
+    {
+        TODO("Retrieve the hotspot angle");
+        return 0.0f;
+    }
+    virtual void SetFallsize (TimeValue time, float f)
+    {
+        TODO("Set the falloff setting for the light");
+    }
+    virtual float GetFallsize (TimeValue t, Interval &valid=Interval(0, 0))
+    {
+        TODO("Returns the falloff angle of the light in radians");
+        return 0.0f;
+    }
+    virtual void SetAtten(TimeValue time, int which, float f)
+    {
+        TODO("Sets the specified attenuation range distance at the time passed.");
+    }
+    virtual float GetAtten(TimeValue t, int which, Interval &valid=Interval(0, 0))
+    {
+        TODO("Return the specified attenuation range distance at the time passed.");
+        return 0.0f;
+    } 
+    virtual void SetTDist(TimeValue time, float f)
+    {
+        TODO("Sets the light's target distance");
+    }
+    virtual float GetTDist (TimeValue t, Interval &valid=Interval(0, 0))
+    {
+        TODO("Return the light's target distance");
+        return 0.0f;
+    }
+    virtual void SetConeDisplay (int s, int notify=TRUE)
+    {
+        TODO("Sets the light's cone display flag.");    
+    }
+    virtual BOOL GetConeDisplay()
+    {
+        TODO("Return TRUE or FALSE whether or not the cone display is shown");
+        return TRUE;
+    }
+
+    //=========================================================================
+    // AnimatablePlugin overrides
+
+    virtual ClassDesc2* GetClassDesc()
+    {
+        return TemplateLightClassDesc::GetClassDescInstance();
+    }
+
+    //=========================================================================
+    // Utility functions for accessing and settting the parameters. 
+
+    TODO("Replace these with your own functions for accessing and setting any parameters");
+
+    void SetFloat(float x, TimeValue t = Now()) 
+    {
+        SetParameter(FLOAT_PARAM_ID, x, t);
+    }
+
+    float GetFloat(TimeValue t = Now()) 
+    {
+        return GetParameter<float>(FLOAT_PARAM_ID, t);
+    }
+
+    void SetNode(INode* node, TimeValue t = Now())
+    {
+        return SetParameter<INode*>(NODE_PARAM_ID, node, t);
+    }
+
+    INode* GetNode(TimeValue t = Now())
+    {
+        return GetParameter<INode*>(NODE_PARAM_ID, t);
+    }
+};
+
+//======================================================================
