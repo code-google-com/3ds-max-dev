@@ -1,0 +1,13 @@
+#summary Using the Source Code Repository
+
+= Introduction =
+
+All source code on 3ds-max-dev is hosted using a version control system called Subversion or SVN for short. Accessing the latest code can be done easily at any time using an SVN client. 
+
+For Windows users who have no experience with SVN I'd recommend using [http://tortoisesvn.net/ Tortoise SVN Client] which integrates smoothly with Windows explorer. 
+
+The configuration information for accessing the Google code project SVN host is at http://code.google.com/p/3ds-max-dev/source/checkout. 
+
+You do not need a Google account to download a copy of the code repository (a process called synching). 
+
+
