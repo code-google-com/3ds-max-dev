@@ -15,7 +15,7 @@ The more we pull together to help each other as a community the more valuable it
 
 A number of studios and individuals are already contributing open-source code and ultimately we hope to pull them together. Some examples of successful open-source projects by game and film studios on Google code include:
  
-  * [http://blur-dev.googlecode.com Blur studios]
+  * [http://blur-dev.googlecode.com Blur studios] - Developed a MAXSCript to Python binding, among other things.  
   * [http://code.google.com/p/dynamica/ Dynamica] - A Maya and 3ds max Plugin for Bullet Rigid Body Dynamics 
   * [http://code.google.com/p/pymel/ PyMEL] - A Pythoninc exposure of the MEL command languages developed by 
 [http://www.luma-pictures.com/ Luma Pictures].
