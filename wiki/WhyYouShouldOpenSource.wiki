@@ -1,14 +1,13 @@
-#summary Why contributing to an open-source community makes sense for studios.
+#summary Why contributing to an open-source community makes sense for studios and artists.
 
-= Why you should consider following open-source =
+= Why you should consider open-source =
 
-There are a number of reasons why joining an open-source community, and making in-house tools and scripts available via an open-source license makes sense for artists and studios:
+There are a number of reasons why joining an open-source community, and making in-house tools and scripts available via an open-source license makes sense for artists and studios.
 
-  # Increased chance of having bugs identified, and fixes submitted.
+  # Increased chance of having bugs identified and fixed.
   # Increased chance that someone will suggest features and improvements for your tool.
-  # Being part of a community means that you can get feedback and support quickly. 
-  # You can follow other peoples
-  # You can get feedback more quickly. 
+  # You can get feedback and support more quickly. 
+  # You profit from other people's contributions, and are informed quickly when they make updates. 
   # Other people may port your tools to other platforms.
   # You can leverage powerful issue tracking, versioning, and collaboration tools for free.
   
