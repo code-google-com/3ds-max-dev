@@ -1,7 +1,12 @@
 ------------------------------------------------------------------------------------------------------------------
--- This script creates a mini scene explorer.
--- Original author: Alessandro Ardolino
+-- MiniSceneExplorer (was mxs_BasicOutliner)
+-- Original author: Copyright Alessandro Ardolino
 -- Modifications: Christopher Diggins
+-- License: The New BSD License 1.0 
+-- Description: 
+--   Demonstrates a simple scene explorer with a user interface created using .NET.
+--   Before running you have to copy the folder "aa_icons" to the "C:\" drive. 
+--   This tool was inspired by the outliner dialog in Maya.  
 ------------------------------------------------------------------------------------------------------------------
 
 -- Main split container
@@ -34,10 +39,10 @@ mainTabCtrl.controls.add explorerTabPage
 -- Add the tab control to the panel1 of the globalSplitContainer
 globalSplitContainer.Panel1.controls.add mainTabCtrl
 
--- explorer tree view object
+-- Explorer tree view object
 global explorerTV = dotNetObject "System.Windows.Forms.TreeView"
 
---add to the right tab page
+-- Add to the right tab page
 explorerTabPage.controls.add explorerTV
 explorerTV.height = 256
 explorerTV.width = 128
@@ -52,7 +57,9 @@ global explorerTV_expanded = false
 
 -- The image list containing ALL the icons and images used in the tool
 global imgList = dotNetObject "System.Windows.Forms.ImageList"
+imgList.TransparentColor = (dotNetClass "system.drawing.color").white
 
+-- Utitlity function for loading a specific image
 fn loadImg fileName =
 (
    imgList.Images.Add( (dotNetClass "System.Drawing.Image").FromFile("C:\\aa_icons\\" + fileName))
@@ -68,11 +75,13 @@ loadImg("06_aa_icon_expandAll.png")
 loadImg("07_aa_icon_drive.png")
 loadImg("08_aa_icon_folder.png")
 	
-imgList.TransparentColor = (dotNetClass "system.drawing.color").white
+-- Set the image of list of the explorer TreView control
 explorerTV.imageList = imgList
+
+-- Set the image of the "expand all button".
 expandAllBtn.image = imgList.images.item[5]
 
--- The main dotnet form
+-- The main form (note: it derives from MaxCustomControls.MaxForm)
 global hForm = dotNetObject "MaxCustomControls.MaxForm"
 hForm.text = "basic explorer"
 hForm.height = 512
@@ -83,6 +92,7 @@ hform.formBorderStyle = (dotNetClass "System.Windows.Forms.FormBorderStyle").Siz
 maxWinPtr = DotNetObject "System.IntPtr" (windows.getMAXHWND())
 HWINDptr = DotNetObject "MaxCustomControls.Win32HandleWrapper" maxWinPtr
 		
+-- Create a context menu
 global explorerCM = dotNetObject "System.Windows.Forms.ContextMenu"
 explorerTV.ContextMenu = explorerCM
 
@@ -93,6 +103,7 @@ global tree_node = dotNetClass "System.Windows.Forms.TreeNode"
 ------------------------------------------------------------------------------------------------------------------------------------
 -- Functions
 
+-- Add children nodes to explorer TreeView
 fn explorerTV_addChildren theNode theChildren =
 (
 	for c in theChildren do
@@ -111,23 +122,24 @@ fn explorerTV_addChildren theNode theChildren =
 	)
 )
 	
+-- TreeView node creation function
 fn explorerTV_createNodes explorerTV = 
 (
-	  explorerTV.BeginUpdate()
-		explorerTV.Nodes.Clear()
-		theRoot = explorerTV.Nodes.add "scene root" --add parent node
-		theRoot.tag = dotNetMXSValue "root"
-		theRoot.name = "rNode"
-		theRoot.imageIndex = 4
-		theRoot.SelectedImageIndex = 4
+	explorerTV.BeginUpdate()
+	explorerTV.Nodes.Clear()
+	theRoot = explorerTV.Nodes.add "scene root" --add parent node
+	theRoot.tag = dotNetMXSValue "root"
+	theRoot.name = "rNode"
+	theRoot.imageIndex = 4
+	theRoot.SelectedImageIndex = 4
 		
-		rootNodes = for o in objects where o.parent == undefined collect o
+	rootNodes = for o in objects where o.parent == undefined collect o
 
-		explorerTV_addChildren theRoot rootNodes --no need to pass the TreeView
+	explorerTV_addChildren theRoot rootNodes --no need to pass the TreeView
 
-		rNode = explorerTV.Nodes.Find "rNode" false
-		rNode[1].Expand()
-	  explorerTV.EndUpdate()	
+	rNode = explorerTV.Nodes.Find "rNode" false
+	rNode[1].Expand()
+	explorerTV.EndUpdate()	
 )
 
 -- On drag over event
@@ -181,14 +193,7 @@ fn explorerTV_leftClick explorerTV arg =
 	oTV_lastSelected = hitNode
 )
 
-
--- Context menu actions
-fn mi_delete_c sender arg = 
-( undo on (delete $) )
-
----------------------------------------------------------------
 -- Rename
-
 fn mi_rename_c sender arg = 
 (
 	explorerTV.SelectedNode = oTV_lastSelected
@@ -197,6 +202,7 @@ fn mi_rename_c sender arg =
 		explorerTV.SelectedNode.BeginEdit()
 )
 
+-- Call back when tree-view node is edited 
 fn explorerTV_AfterLabelEdit sender arg = 
 (
 	explorerTV.LabelEdit = false
@@ -207,16 +213,9 @@ fn explorerTV_AfterLabelEdit sender arg =
 	explorerTV_createNodes explorerTV 
 )
 
-fn mi_exprtSel_c sender arg = 
-(
-	--ask for the path
-	--select all the children of the current node, option??
-	--exportFile $.name selectedOnly:true
-	print "to be implemented..."
-)
-
 ---------------------------------------------------------------
 
+fn mi_delete_c sender arg = ( undo on (delete $) )
 fn mi_hideSel_c sender arg = (undo on (hide $))
 fn mi_unhideSel_C sender arg = (undo on (unhide $))
 
@@ -236,9 +235,9 @@ fn explorerTV_rightClick explorerTV arg =
 	
 	oTV_lastSelected = hitNode
 	
-  if hitNode != undefined and hitNode.tag.value != "root" do(
+    if hitNode != undefined and hitNode.tag.value != "root" do(
 
-  --change the intems in the context menu
+    --change the intems in the context menu
 	--title, object based
 	explorerTV.ContextMenu.menuItems.clear()
 	mi_header = dotNetObject "System.Windows.Forms.MenuItem"
@@ -274,16 +273,14 @@ fn explorerTV_rightClick explorerTV arg =
 	)--end do...delete!!
 )
 
-
+-- Mouse button handler 
 fn explorerTV_mouseCheck sender arg =
 (
 	if arg.button==arg.button.left do explorerTV_leftClick explorerTV arg
 	if arg.button==arg.button.right do explorerTV_rightClick explorerTV arg
 )
 
-------------------------------------------------------------------------------------------------------------------------------------
--- Button methods
-
+-- Expand all button event
 fn expandAllBtn_click sender arg = 
 (
 	if(explorerTV_expanded == false) then
@@ -302,7 +299,7 @@ fn expandAllBtn_click sender arg =
 -- On form closed event
 fn mainFormClosed sender arg = 
 (
-	--delete all the callbacks!
+	-- delete all the callbacks
 	callbacks.RemoveScripts #sceneNodeAdded id:#nodeAdd_clbck
 	callbacks.RemoveScripts #sceneNodeAdded id:#nodeDel_clbck
 	callbacks.RemoveScripts #sceneNodeAdded id:#nodeRename_clbck
@@ -312,9 +309,7 @@ fn mainFormClosed sender arg =
 	callbacks.RemoveScripts #sceneNodeAdded id:#redo_clbck
 )
 
-------------------------------------------------------------------------------------------------------------------------------------
--- Event Handlers:
-
+-- Set Event Handlers:
 dotNet.addEventHandler hForm "Closed" mainFormClosed
 dotNet.addEventHandler explorerTV "mouseDown" explorerTV_mouseCheck
 dotNet.addEventHandler explorerTV "DragOver" explorerTV_dragOver
@@ -323,12 +318,11 @@ dotNet.addEventHandler explorerTV "DragDrop" explorerTV_dragdrop
 dotNet.addEventHandler explorerTV "AfterLabelEdit" explorerTV_AfterLabelEdit
 dotNet.addEventHandler expandAllBtn "Click" expandAllBtn_click
 
-------------------------------------------------------------------------------------------------------------------------------------
--- Initializers
-
+-- Initialize the explorer Tree View
 explorerTV_createNodes explorerTV
 
---callback for the update of the treeview --> need a system to remove it!
+-- Callback for the update of the treeview 
+-- Note: these are not removed! A new system needs to be implemented to remove it.
 callbacks.addScript #sceneNodeAdded "explorerTV_createNodes explorerTV" id:#nodeAdd_clbck
 callbacks.addScript #nodePostDelete "explorerTV_createNodes explorerTV" id:#nodeDel_clbck
 callbacks.addScript #nodeRenamed "explorerTV_createNodes explorerTV" id:#nodeRename_clbck
@@ -337,5 +331,5 @@ callbacks.addScript #postMirrorNodes "explorerTV_createNodes explorerTV" id:#nod
 callbacks.addScript #sceneUndo "explorerTV_createNodes explorerTV" id:#undo_clbck
 callbacks.addScript #sceneRedo "explorerTV_createNodes explorerTV" id:#redo_clbck
 
---show the form
+-- Show the form
 hForm.show(HWINDptr)
