@@ -1,0 +1,10 @@
+C:\Users\Alessandro\Documents\Visual Studio 2008\Projects\basicOutliner\basicOutliner\bin\Release\basicOutliner.dll
+C:\Users\Alessandro\Documents\Visual Studio 2008\Projects\basicOutliner\basicOutliner\bin\Release\basicOutliner.pdb
+C:\Users\Alessandro\Documents\Visual Studio 2008\Projects\basicOutliner\basicOutliner\obj\Release\ResolveAssemblyReference.cache
+C:\Users\Alessandro\Documents\Visual Studio 2008\Projects\basicOutliner\basicOutliner\obj\Release\basicOutliner.dll
+C:\Users\Alessandro\Documents\Visual Studio 2008\Projects\basicOutliner\basicOutliner\obj\Release\basicOutliner.pdb
+C:\Users\Alessandro\Documents\Visual Studio 2008\Projects\basicOutliner\basicOutliner\obj\Release\basicOutliner.basicOutliner_mainForm.resources
+C:\Users\Alessandro\Documents\Visual Studio 2008\Projects\basicOutliner\basicOutliner\obj\Release\basicOutliner.Properties.Resources.resources
+C:\Users\Alessandro\Documents\Visual Studio 2008\Projects\basicOutliner\basicOutliner\obj\Release\basicOutliner.csproj.GenerateResource.Cache
+C:\Users\Alessandro\Documents\Visual Studio 2008\Projects\basicOutliner\basicOutliner\bin\Release\ManagedServices.dll
+C:\Users\Alessandro\Documents\Visual Studio 2008\Projects\basicOutliner\basicOutliner\bin\Release\CSharpUtilities.dll

@@ -1,0 +1,1 @@
+before run the script please copy the aa_icons folder to your C:\ drive
