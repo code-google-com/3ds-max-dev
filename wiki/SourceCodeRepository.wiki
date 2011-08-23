@@ -1,6 +1,6 @@
 #summary Using the Source Code Repository
 
-= Introduction =
+= Using the Source Code Repository =
 
 All source code on 3ds-max-dev is hosted using a version control system called Subversion or SVN for short. Downloading the latest code can be done easily at any time using an SVN client. The contents of the SVN repository can also be browsed online in your internet browser by going to http://code.google.com/p/3ds-max-dev/source/browse/. 
 
