@@ -5,7 +5,7 @@
 -- License: The New BSD License 1.0 
 -- Description: 
 --   Demonstrates a simple scene explorer with a user interface created using .NET.
---   Before running you have to copy the folder "aa_icons" to the "C:\" drive. 
+--   Before running you have to copy the folder "aa_icons" to the "scripts" subfolder. 
 --   This tool was inspired by the outliner dialog in Maya.  
 ------------------------------------------------------------------------------------------------------------------
 
@@ -62,7 +62,8 @@ imgList.TransparentColor = (dotNetClass "system.drawing.color").white
 -- Utitlity function for loading a specific image
 fn loadImg fileName =
 (
-   imgList.Images.Add( (dotNetClass "System.Drawing.Image").FromFile("C:\\aa_icons\\" + fileName))
+    path = symbolicPaths.getPathValue "$scripts"
+    imgList.Images.Add( (dotNetClass "System.Drawing.Image").FromFile(path + "\\aa_icons\\" + fileName))
 )
 
 loadImg("00_aa_icon_drawed.png")
