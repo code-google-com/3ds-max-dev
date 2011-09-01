@@ -5,7 +5,7 @@
 -- License: The New BSD License 1.0 
 -- Description: 
 --   Demonstrates a simple scene explorer with a user interface created using .NET.
---   Before running you have to copy the folder "aa_icons" to the "scripts" subfolder. 
+--   Before running you have to copy this folder to the "scripts" subfolder of 3ds Max. 
 --   This tool was inspired by the outliner dialog in Maya.  
 ------------------------------------------------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ imgList.TransparentColor = (dotNetClass "system.drawing.color").white
 fn loadImg fileName =
 (
     path = symbolicPaths.getPathValue "$scripts"
-    imgList.Images.Add( (dotNetClass "System.Drawing.Image").FromFile(path + "\\aa_icons\\" + fileName))
+    imgList.Images.Add( (dotNetClass "System.Drawing.Image").FromFile(path + "MiniSceneExplorer\\aa_icons\\" + fileName))
 )
 
 loadImg("00_aa_icon_drawed.png")
