@@ -86,10 +86,6 @@ void SampleKFCtrl::GetValue(TimeValue t, void *ptr, Interval &valid, GetSetMetho
         Matrix3* m3InVal = (Matrix3*)ptr;
         m3InVal->PreTranslate(p3OurAbsValue);
     }
-
-    //valid = GetCOREInterface()->GetAnimRange();
-    if (valid.End() < 0)
-        valid.Set(valid.Start(), 0);
 }
 
 
