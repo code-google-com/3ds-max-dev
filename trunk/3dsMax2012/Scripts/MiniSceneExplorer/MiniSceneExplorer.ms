@@ -63,7 +63,7 @@ imgList.TransparentColor = (dotNetClass "system.drawing.color").white
 fn loadImg fileName =
 (
     path = symbolicPaths.getPathValue "$scripts"
-    imgList.Images.Add( (dotNetClass "System.Drawing.Image").FromFile(path + "MiniSceneExplorer\\aa_icons\\" + fileName))
+    imgList.Images.Add( (dotNetClass "System.Drawing.Image").FromFile(path + "\\MiniSceneExplorer\\aa_icons\\" + fileName))
 )
 
 loadImg("00_aa_icon_drawed.png")
