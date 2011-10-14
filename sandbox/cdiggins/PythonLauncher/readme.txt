@@ -1,3 +1,6 @@
+Python Script Launcher Project
+==============================
+
 This project creates a custom user action for launching Python scripts.
 
 1) you have to copy the DLL files from the install folder to the root folder of 3ds Max 2012.
