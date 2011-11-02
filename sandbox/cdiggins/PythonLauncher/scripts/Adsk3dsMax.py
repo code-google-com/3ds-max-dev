@@ -5,10 +5,11 @@ clr.AddReference("Autodesk.Max")
 
 from Autodesk.Max import *
 
+# Provides access to services offered by 3ds Max 
 class Application(object):
     def __init__(self):
         self.g = GlobalInterface.Instance
-        self.i = self.g.COREInterface13
+        self.i = self.g.COREInterface13    
 
     def Print(self, text):
         self.g.ExecuteMAXScriptScript("format \"" + text + "\n\" print", False, None)
@@ -17,6 +18,7 @@ class Application(object):
     def SceneRoots(self):
         yield Node(self.i.RootNode)
 
+# A node in the scene graph.  
 class Node(object):
     def __init__(self, _inode):
         self.node = _inode
@@ -31,7 +33,7 @@ class Node(object):
         return self.node.Name
     
     @Name.setter  
-    def fset(self, value):
+    def set_Name(self, value):
         self.node.Name = value
     
     @property
@@ -43,9 +45,14 @@ class Node(object):
         return self.node.Selected
     
     @Selected.setter    
-    def fset(self, value):
+    def set_Selected(self, value):
         self.node.Selected = value
+        
+    @property
+    def Tranform(sefl):
+        return 
 
+# Singleton instance of the Application object 
 App = Application()
 
 def DemoPrintNodes():
@@ -54,7 +61,7 @@ def DemoPrintNodes():
         for n2 in n.Children:
             PrintNode(n2, "  " + indent)
 
-        for n in App.SceneRoots:
-            PrintNode(n, "")
+    for n in App.SceneRoots:
+        PrintNode(n, "")
 
-DemoPrintNodes()
+# DemoPrintNodes()
