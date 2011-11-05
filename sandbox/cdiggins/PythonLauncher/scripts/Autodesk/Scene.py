@@ -4,6 +4,7 @@ import clr
 clr.AddReference("Autodesk.Max")
 
 from Autodesk.Max import *
+from MaxUtilities import *
 
 # Provides access to services offered by 3ds Max 
 class Application(object):
@@ -49,7 +50,7 @@ class Node(object):
         self.node.Selected = value
         
     @property
-    def Tranform(sefl):
+    def Tranform(self):
         return 
 
 # Singleton instance of the Application object 

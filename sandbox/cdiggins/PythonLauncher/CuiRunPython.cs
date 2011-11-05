@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Threading.Tasks;
 
 using Autodesk.Max;
 
@@ -64,7 +65,8 @@ namespace PythonLauncher
                 var options = new Dictionary<string, object>();
                 options["Debug"] = true;
                 ScriptRuntime sr = Python.CreateRuntime(options);
-                sr.ExecuteFile(filename);                
+
+                Task.Factory.StartNew(() => sr.ExecuteFile(filename));
                 
                 // NOTE: we could have also done something like
                 // dynamic script = py.UseFile("script.py");
