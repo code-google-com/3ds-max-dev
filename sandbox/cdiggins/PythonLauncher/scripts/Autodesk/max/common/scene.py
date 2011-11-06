@@ -105,25 +105,19 @@ class Element(object):
     def mesh(self):
         return Mesh(_object)
 
-class Mesh(object):
+class Mesh(object):                
+    def __init__(self, m)
+        self._mesh = m
+	self.faces = tuple(_face_to_tuple(m.Faces[i]) for i in xrange(0, m.NumFaces))
+	self.vertices = tuple(m.Verts[i] for i in xrange(0, m.NumVerts))
+	self.normals = tuple(_point3_to_tuple(m.getFaceNormal(i)) for i in xrange(0, m.NumFaces)))
+	self.uvs = tuple(self._uvcoords()) 
+
     def _uvcoords(self):
         for f in xrange(0, self._mesh.NumFaces):
             tvface = self._mesh.tvFace[f]
-            for i in xrange(0, 2):
+            for i in xrange(0, 3):
                 yield self._mesh.tverts(tvface.t[i])
-                
-    def __init__(self, m)
-        self._mesh = m
-	self.faces = tuple((_face_to_tuple(m.Faces[i]) for i in xrange(0, m.NumFaces)))
-	self.vertices = tuple(m.Verts[i] for i in xrange(0, m.NumVerts))
-	self.normals = tuple(_point3_to_tuple(m.getFaceNormal(i)) for i in xrange(0, m.NumFaces)))
-	self.uvs = tuple(_uvcoords) 
-
-    def num_faces(self):
-        return len(self.faces)
-
-    def num_vertices(self):
-        return len(self.vertices)
 		
 # Singleton instance of the Application object 
 app = Application()
