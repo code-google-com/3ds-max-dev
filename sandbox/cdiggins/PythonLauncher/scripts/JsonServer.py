@@ -22,7 +22,7 @@ def run_while_true(server_class, handler_class):
     cnt = 0
     while cnt < 3:
         cnt = cnt + 1
-        App.Print("Waiting for next request")
+        #App.Print("Waiting for next request")
         httpd.handle_request()
 
 run_while_true(BaseHTTPServer.HTTPServer, MyHandler)
