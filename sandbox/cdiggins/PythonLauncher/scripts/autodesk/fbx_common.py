@@ -83,7 +83,6 @@ class GeometricObject(base.BaseGeometricObject):
 
 class Mesh(base.BaseMesh):                
     def __init__(self, m):        
-        m.ComputeVertexNormals()
         self.faces = tuple(_get_faces(m))                
         self.uvs = tuple(_get_uvs(m.GetLayer(0)))
         self.vertices = tuple((x[0], x[1], x[2]) for x in m.GetControlPoints())
@@ -99,11 +98,6 @@ def _get_faces(m):
             yield (m.GetPolygonVertex(i, 1), m.GetPolygonVertex(i, 2), m.GetPolygonVertex(i, 3))
         else:
             raise Exception('Only triangle and quad meshes are supported') 
-
-def _v3_avg(v0, v1, v2):
-    return ((v0[0] + v1[0] + v2[0]) / 3.0, 
-            (v0[1] + v1[1] + v2[1]) / 3.0, 
-            (v0[2] + v1[2] + v2[2]) / 3.0)
 
 def _get_uvs(layer):        
     # TODO: finish

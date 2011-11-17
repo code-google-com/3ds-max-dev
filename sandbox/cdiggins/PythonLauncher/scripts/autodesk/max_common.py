@@ -1,13 +1,8 @@
-# Requires the 3ds Max 2012 Subscription Advantage Pack to be installed. 
-# Written by Christopher Diggins
-# Copyright Autodesk
-# Licensed under the New BSD License
-
 import clr
 clr.AddReference("Autodesk.Max")
 import Autodesk.Max 
 
-class Application(object):
+class Application(BaseApplication):
     def __init__(self):
         self._g = Autodesk.Max.GlobalInterface.Instance
         self._i = self._g.COREInterface13    
@@ -21,7 +16,7 @@ class Application(object):
     def roots(self):
         yield Node(self._i.RootNode)        
         
-class Node(object):
+class Node(BaseNode):
     def __init__(self, inode):
         self._node = inode
     
@@ -29,13 +24,6 @@ class Node(object):
     def children(self):
         for i in xrange(self._node.NumberOfChildren):
             yield Node(self._node.GetChildNode(i))
-
-    @property
-    def tree(self):
-        for child in self.children: 
-            for desc in child.tree:
-                yield desc
-        yield self
 
     @property
     def name(self):
@@ -69,7 +57,7 @@ class Node(object):
         if obj == None: return None
         return GeometricObject(obj)
 
-class GeometricObject(object):
+class GeometricObject(BaseGeometricObject):
     def __init__(self, e):
         self._object = e
         
@@ -81,7 +69,7 @@ class GeometricObject(object):
     def name(self):
         return self._object.ObjectName
 
-class Mesh(object):                
+class Mesh(BaseMesh):                
     def __init__(self, m):
         self.faces = tuple(_face_to_tuple(m.Faces[i]) for i in xrange(m.NumFaces))
         self.vertices = tuple(_point3_to_tuple(m.Verts[i]) for i in xrange(m.NumVerts))
