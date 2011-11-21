@@ -15,7 +15,11 @@ class BaseApplication(object):
 
     def load_file(self, fname):
         ''' Opens the specified file. '''   
-        return False
+        raise NotImplementedError()
+    
+    def save_file(self, fname):
+        ''' Opens the specified file. '''   
+        raise NotImplementedError()
     
     def shutdown(self):
         ''' Shuts down the host application. '''
@@ -31,8 +35,16 @@ class BaseApplication(object):
         ''' All nodes in the scene in depth first order. '''
         for root in self.roots:
             for node in root.tree:
-                yield node      
-    
+                yield node
+
+    def create_node(self, name='', parent=None):
+        ''' Creates a new node in the scene graph '''
+        return None        
+		
+    @property
+    def product(self):
+        return "unknown"
+	
 class BaseNode(object):    
     ''' A node in the scene graph. '''
     
@@ -49,7 +61,7 @@ class BaseNode(object):
     @property
     def tranform(self):
         ''' The local transform matrix. '''
-        return ((0,0,0,0),(0,0,0,0),(0,0,0,0),(0,0,0,0))
+        return ((1,0,0,0),(0,1,0,0),(0,0,1,0),(0,0,0,1))
                 
     @property
     def element(self):
@@ -58,17 +70,26 @@ class BaseNode(object):
                     
     @property
     def tree(self):
+        ''' Returns the entire node hierarchy. '''
         for child in self.children: 
             for desc in child.tree:
                 yield desc
-        yield self  
+        yield self
+
+    def add_child(self, node):
+        ''' Adds a child node '''
+        raise NotImplementedError()
+
+    def remove_child(self, node):
+        ''' Removes (detaches) a child node ''' 
+        raise NotImplementedError()
 
 class BaseGeometricObject(object):
     ''' An element of the scene with a geometric representation. '''
     
     @property 
     def mesh(self):
-        ''' A triangle mesh. '''
+        ''' Returns the associated triangle mesh '''
         return None
 
 class BaseMesh(object):                

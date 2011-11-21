@@ -2,7 +2,7 @@
 # Copyright Autodesk
 # Licensed under the New BSD License
 
-import pymel.core as pm
+import pymel.core as maya
 import base
 
 class Application(base.BaseApplication):
@@ -14,14 +14,19 @@ class Application(base.BaseApplication):
 
     @property
     def roots(self):
-        # return all transform nodes without a parent
-        return (Node(x) for x in pm.ls(tr=True) if not pm.listRelatives(x, parent=True))  
+        for x in maya.ls(tr=True):
+            if x and not _parents(x):
+                yield Node(x)
         
-    def load_file(self, fname):
-        return pm.importFile
+    def load_file(self, fname):        
+        return maya.importFile(fname)
+        
+    def save_file(self, fname):
+        return maya.saveAs(fname)
     
-    def shutdown(self):
-        self._mgr.Destroy()
+    @property
+    def product(self):
+        return "Autodesk Maya"    
         
 class Node(base.BaseNode):
     def __init__(self, node):
@@ -29,21 +34,24 @@ class Node(base.BaseNode):
     
     @property
     def children(self):
-        return pm.listRelatives(self._node)
+        for x in maya.listRelatives(self._node, type='transform'):
+            if x:
+                yield Node(x)
 
     @property
     def name(self):
-        return self._node.Name()
+        return self._node.nodeName()
     
     @name.setter  
     def set_name(self, value):
-        pm.rename(self._node, value)
+        maya.rename(self._node, value)
     
     @property
     def parent(self):
-        xs = pm.listRelatives(self._node, parent=True)
+        xs = maya.listRelatives(self._node, parent=True)
         if len(xs) < 1: return None
-        return xs[0]
+        if not xs[0]: return None
+        return Node(xs[0])
     
     @property
     def transform(self):
@@ -51,64 +59,70 @@ class Node(base.BaseNode):
                 
     @property
     def element(self):
-        return self._node.getShape()
-                        
+        shp = self._node.getShape()
+        if not shp: return None
+        if not shp.type() == 'mesh': return None
+        return GeometricObject(shp)
+
+    @property
+    def selected(self):
+        return self._node in maya.selected()
+
+    @selected.setter
+    def selected(self, value):
+        if value:
+            maya.select(self._node, add=True)
+        else:
+            maya.select(self._node, deselect=True)
+                    
 class GeometricObject(base.BaseGeometricObject):
-    def __init__(self, shape):
+    def __init__(self, shape):        
         self._shape = shape
         
     @property 
     def mesh(self):
-        return Mesh(self._attr)
-
-class Mesh(base.BaseMesh):                
-    def __init__(self, mesh):    
-        self._mesh = mesh
+        return Mesh(self._shape)
         
     @property
-    def indices(self):
-        for f in self._mesh.faces
-            vxs = f.getVertices()
-            poly_size = len(vxs)
-            if poly_size == 3:
-                yield vxs[0]; yield vxs[1]; yield vxs[2]
-            elif poly_size == 4:
-                yield vxs[0]; yield vxs[1]; yield vxs[3]
-                yield vxs[1]; yield vxs[2]; yield vxs[3]
-            else:
-                raise Exception('Only triangle and quad meshes are supported') 
-                        
-    @property 
-    def uvs(self):
-        for f in self._mesh.faces
-            poly_size = len(f.getVertices())
-            if poly_size == 3:
-                yield f.getUV(0); yield f.getUV(1); yield f.getUV(2)
-            elif poly_size == 4:
-                yield f.getUV(0); yield f.getUV(1); yield f.getUV(3)
-                yield f.getUV(1); yield f.getUV(2); yield f.getUV(2)
-            else:
-                raise Exception('Only triangle and quad meshes are supported') 
+    def name(self):
+        return self._shape.nodeName()
     
-    @property
-    def vertices(self):
-        return (tuple(v) for v in self._mesh.getPoints())        
+    @name.setter  
+    def set_name(self, value):
+        maya.rename(self._shape, value)
+
+class Mesh(base.BaseMesh):              
+    def __init__(self, mesh):
+        # Should really do the triangulation in memory rather than changing the scene
+        maya.polyTriangulate(mesh)
+        self.vertices = tuple(tuple(v) for v in mesh.getPoints())
+        self.indices = tuple(self._compute_indices(mesh))
+        self.uvs = tuple(self._compute_uvs(mesh))
+        self.normals = tuple(self._compute_normals(mesh))
         
-    @property
-    def normals(self):
-        for f in m.faces:
-            poly_size = len(f.getVertices)
+    def _compute_indices(self, mesh):
+        for f in mesh.faces:
+            vxs = f.getVertices()
+            for i in xrange(3):
+                yield vxs[i]            
+            
+    def _compute_uvs(self, mesh):
+        for f in mesh.faces:
+            for i in xrange(3):
+                yield tuple(f.getUV(i))
+                
+    def _compute_normals(self, mesh):
+        for f in mesh.faces:
             normals = f.getNormals()
-            if poly_size == 3:
-                yield normals[0]; yield normals[1]; yield normals[2]
-            elif poly_size == 4:
-                yield normals[0]; yield normals[1]; yield normals[3]
-                yield normals[1]; yield normals[2]; yield normals[3]
-            else:
-                raise Exception('Only triangle and quad meshes are supported') 
+            for i in xrange(3):
+                yield tuple(normals[i])
 
 def _mat_to_tuple(m):
     return tuple(tuple(r) for r in m)
 
+def _parents(x):
+    return maya.listRelatives(x, parent=True)
+
 ''' This is a singleton representing the application '''
 app = Application()
+

@@ -5,6 +5,7 @@ using System.Text;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Threading.Tasks;
+using System.IO;
 
 using Autodesk.Max;
 
@@ -57,18 +58,35 @@ namespace PythonLauncher
         {
             try
             {
-                // Key to making sure that Visual Studio can debug
+                // This environment variable can be used from scripts to iidentify 
+                // that is being run from 3ds Max
+                System.Environment.SetEnvironmentVariable("ADSKPRODUCT", "max");
+
+                // This is the Key to making sure that Visual Studio can debug
                 // the Python script. This way you can attach to 3dsMax.exe
                 // and catch exceptions that occur right at the correct location 
-                // in the Python script. Otherwise debugging the thing is just 
-                // too darn hard. 
+                // in the Python script. 
                 var options = new Dictionary<string, object>();
                 options["Debug"] = true;
-                ScriptRuntime sr = Python.CreateRuntime(options);
 
-                Task.Factory.StartNew(() => sr.ExecuteFile(filename));
+                // Create an instance of the Python run-time
+                var runtime = Python.CreateRuntime(options);
+
+                // Retrive the Python scripting engine 
+                var engine = Python.GetEngine(runtime);
+
+                // Get the directory of the file 
+                var dir = Path.GetDirectoryName(filename);                       
                 
-                // NOTE: we could have also done something like
+                // Make sure that the local paths are available.
+                var paths = engine.GetSearchPaths();                
+                paths.Add(dir);
+                engine.SetSearchPaths(paths);
+
+                // Run the Python file
+                runtime.ExecuteFile(filename);
+                
+                // NOTE: here is a cute IronPython trick with C# 4.0
                 // dynamic script = py.UseFile("script.py");
                 // dynamic result = script.SomFunc(); 
             }

@@ -1,22 +1,33 @@
+# Load the .NET API from 3ds Max 
 import clr
 clr.AddReference("Autodesk.Max")
-import Autodesk.Max 
+import Autodesk.Max
 
-class Application(BaseApplication):
+# Load your local instance of Python 2.6
+import sys
+sys.path.append("C:\Python26\Lib")
+
+# Load the base classes.
+import base
+
+class Application(base.BaseApplication):
     def __init__(self):
         self._g = Autodesk.Max.GlobalInterface.Instance
         self._i = self._g.COREInterface13    
 
     def write_line(self, text):
-        # There might be a more direct way to do this from the Autodesk.Max namespace
-        s = str(text).replace("\"", "\\\"")
-        self._g.ExecuteMAXScriptScript("format \"" + s + "\n\" print", False, None)
+        self._g.TheListener.EditStream.Wputs(text + "\n")
+        self._g.TheListener.EditStream.Flush()
 
     @property
     def roots(self):
         yield Node(self._i.RootNode)        
         
-class Node(BaseNode):
+    @property
+    def product(self):
+        return "Autodesk 3ds Max"    
+		
+class Node(base.BaseNode):
     def __init__(self, inode):
         self._node = inode
     
@@ -57,7 +68,7 @@ class Node(BaseNode):
         if obj == None: return None
         return GeometricObject(obj)
 
-class GeometricObject(BaseGeometricObject):
+class GeometricObject(base.BaseGeometricObject):
     def __init__(self, e):
         self._object = e
         
@@ -69,22 +80,37 @@ class GeometricObject(BaseGeometricObject):
     def name(self):
         return self._object.ObjectName
 
-class Mesh(BaseMesh):                
+class Mesh(base.BaseMesh):                
     def __init__(self, m):
-        self.faces = tuple(_face_to_tuple(m.Faces[i]) for i in xrange(m.NumFaces))
-        self.vertices = tuple(_point3_to_tuple(m.Verts[i]) for i in xrange(m.NumVerts))
-        self.normals = tuple(_point3_to_tuple(m.FaceNormal(i, False)) for i in xrange(m.NumFaces))
-        self.uvs = tuple(_tvface_to_tuple(m.TvFace[i]) for i in xrange(m.NumFaces))
+        m.BuildNormals()
+        self.indices = tuple(self._compute_indices(m))
+        self.vertices = tuple(_point3_to_tuple(v) for v in m.Verts)
+        self.normals = tuple(self._compute_normals(m))
+        self.uvs = tuple(self._compute_uvs(m))
 
-def _face_to_tuple(face):
-    return (int(face.V[0]), int(face.V[1]), int(face.V[2]))
-    
+    def _compute_indices(self, m):
+        for f in m.Faces:
+            for v in f.V:
+                yield int(v)
+
+    def _compute_normals(self, m):
+        for i in xrange(m.NumFaces):
+            yield _point3_to_tuple(m.FaceNormal(i, False)) 
+            yield _point3_to_tuple(m.FaceNormal(i, False)) 
+            yield _point3_to_tuple(m.FaceNormal(i, False)) 
+        
+    def _compute_uvs(self, m):
+        for f in m.TvFace:
+            for v in f.T:
+                uvw = m.TVerts[v]				
+                yield (float(uvw[0]), float(uvw[1]))
+            
 def _point3_to_tuple(p):
     return (float(p.X), float(p.Y), float(p.Z))
 
-def _tvface_to_tuple(tvf):
-    return (int(tvf.T[0]), int(tvf.T[1]))
-            
+def _matrix_to_tuple(mat):
+    return tuple(_point3_to_tuple(mat.GetRow(i)) for i in xrange(4))
+
 def _obj_to_mesh(obj, time):    
     cid = app._g.Class_ID.Create(9, 0)
     tri = obj.ConvertToType(time, cid)
@@ -93,9 +119,6 @@ def _obj_to_mesh(obj, time):
     tri.MaybeAutoDelete()
     return mesh
     
-def _matrix_to_tuple(mat):
-    return tuple(_point3_to_tuple(mat.GetRow(i)) for i in xrange(4))
-
 def _now():
     return app._i.Time
         

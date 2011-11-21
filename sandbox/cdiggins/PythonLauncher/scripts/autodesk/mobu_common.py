@@ -1,18 +1,38 @@
-class Application(object):
+import base
+import pyfbsdk as mobu
+
+class Application(base.BaseApplication):
     def __init__(self):
-        self._system = FBSystem()
+        self._system = mobu.FBSystem()
 
     @property
-    def scene_roots(self):
-        print node(FBSystem().Scene.RootModel)
+    def roots(self):
+        yield Node(self._system.SceneRootModel)
 
     @property
-    def scene_tree(self):
-        for root in self.scene_roots:
-            for node in root.tree:
-                yield node
-		
-class Node(object):
+    def product(self):
+        return "Autodesk MotionBuilder"    
+        
+    def add_geometry(self, vertices, indices, name):
+        mesh = mobu.FBMesh(name)
+        mesh.GeometryBegin()
+        for v in vertices:
+            mesh.VertexAdd(v[0], v[1], v[2])
+        for f in zip(*[iter(indices)]*3):
+            mesh.PolygonBegin()
+            for i in f:
+                mesh.PolygonVertexAdd(i)
+            mesh.PolygonEnd()
+        mesh.ComputeVertexNormals(True)
+        mesh.GeometryEnd()
+        model = mobu.FBModelCube(name)
+        model.Geometry = mesh
+        v = mobu.FBVector3d(5, 5, 5)
+        model.Scaling = v
+        model.Show = True
+        return model        
+        
+class Node(base.BaseNode):
     def __init__(self, model):
         self._model = model
 
@@ -20,44 +40,61 @@ class Node(object):
     def name(self):
         return self._model.Name
 
+    @name.setter
+    def name(self, value):
+        self._model.Name = value
+        
     @property
     def children(self):
         return (Node(x) for x in self._model.Children)
 
     @property
     def transform(self):
-        mat = FBMatrix()
-        self.model.GetMatrix(mat, FBModelTransformationMatrix.kModelTransformation, False)
+        mat = mobu.FBMatrix()
+        self._model.GetMatrix(mat)
         return _mat_to_tuple(mat)
 
-class Geometry(object):
+    @property
+    def selected(self):
+        return self._model.Select
+
+    @selected.setter
+    def set_selected(self, value):
+        self._model.Select = value
+
+    @property
+    def element(self):
+        return GeometricObject(self._model)
+
+class GeometricObject(base.BaseGeometricObject):
     def __init__(self, model):
         self._model = model
 
     @property
     def mesh(self):
-        return Mesh(self._model.Geometry)
+        g = self._model.Geometry
+        if not g: return None
+        return Mesh(g)
 
-class Mesh(object):
+class Mesh(base.BaseMesh):
     def __init__(self, mesh):
-        self._mesh = mesh
-        self.vertices = tuple(tuple(mesh.VertexGet(i)) from i in xrange(mesh.VertexCount()))
-        self.normals = tuple(tuple(self._get_normal(i)) from i in xrange(mesh.PolygonCount()))
-        self.uvs = tuple(tuple(mesh.VertexUVGet(i)) from i in xrange(mesh.VertexCount()))
-        self.faces = tuple(self._get_face(i) from i in xrange(mesh.PolygonCount())
-
-    def _get_normal(self, i):
-        index = self._mesh.GetNormalsIndexArray()[i];
-        return self._mesh.GetNormalsDirectArray()[index];
-
-    def _get_face(self, i):
-        if not self._mesh.PolygonVertexCount(i) == 3: raise ValueError('Not a triangle mesh')
-        return tuple(self._mesh.PolygonVertexIndex(i) for x in xrange(3))
+        self.vertices = tuple(tuple(mesh.VertexGet(i)) for i in xrange(mesh.VertexCount()))
+        self.indices = tuple(self._compute_indices(mesh))
+        self.uvs = tuple(tuple(mesh.VertexUVGet(i)) for i in self.indices)
+        self.normals = tuple(tuple(mesh.VertexNormalGet(i)) for i in self.indices)
+        
+    def _compute_indices(self, m):
+        for f in xrange(m.PolygonCount()):
+            n = m.PolygonVertexCount(f)
+            for i in xrange(1, n - 1):
+                yield m.PolygonVertexIndex(f, 0)
+                yield m.PolygonVertexIndex(f, i)
+                yield m.PolygonVertexIndex(f, i + 1) 
 
 def _mat_row(mat, row):
-    return tuple(mat[row * 4 + i] from i in xrange(4))
+    return tuple(mat[row * 4 + i] for i in xrange(4))
 
 def _mat_to_tuple(mat):
-    return tuple(_mat_row(i) from i in xrange(4))
-        
+    return tuple(_mat_row(mat, i) for i in xrange(4))
+                       
 app = Application()

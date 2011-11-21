@@ -22,6 +22,10 @@ class Application(base.BaseApplication):
     
     def shutdown(self):
         self._mgr.Destroy()
+		
+	@property
+	def product():
+		return "Autodesk FBX"		
         
 class Node(base.BaseNode):
     def __init__(self, node):
@@ -109,8 +113,7 @@ def _get_layer_array(layer):
         return direct
     else: 
         indices = layer.GetIndexArray
-        return (direct[i] for i in indices)
-    
+        return (direct[i] for i in indices)    
     
 def _get_normals(m):
     ns = None
