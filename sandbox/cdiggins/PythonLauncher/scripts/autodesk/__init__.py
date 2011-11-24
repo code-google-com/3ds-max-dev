@@ -28,13 +28,13 @@ def scene_tree():
 
 def root():
     for n in common.app.roots: 
-		return n
+        return n
     return None
     
 def selected():
     for n in scene_tree(): 
-		if n.selected: 
-			return n
+        if n.selected: 
+            return n
     return None
     
 def output_node_tree(f, n, s=""):

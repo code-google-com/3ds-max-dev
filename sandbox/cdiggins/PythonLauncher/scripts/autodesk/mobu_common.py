@@ -1,9 +1,9 @@
 import base
-import pyfbsdk as mobu
+import pyfbsdk as native
 
 class Application(base.BaseApplication):
     def __init__(self):
-        self._system = mobu.FBSystem()
+        self._system = native.FBSystem()
 
     @property
     def roots(self):
@@ -14,7 +14,7 @@ class Application(base.BaseApplication):
         return "Autodesk MotionBuilder"    
         
     def add_geometry(self, vertices, indices, name):
-        mesh = mobu.FBMesh(name)
+        mesh = native.FBMesh(name)
         mesh.GeometryBegin()
         for v in vertices:
             mesh.VertexAdd(v[0], v[1], v[2])
@@ -25,9 +25,9 @@ class Application(base.BaseApplication):
             mesh.PolygonEnd()
         mesh.ComputeVertexNormals(True)
         mesh.GeometryEnd()
-        model = mobu.FBModelCube(name)
+        model = native.FBModelCube(name)
         model.Geometry = mesh
-        v = mobu.FBVector3d(5, 5, 5)
+        v = native.FBVector3d(5, 5, 5)
         model.Scaling = v
         model.Show = True
         return model        
@@ -50,7 +50,7 @@ class Node(base.BaseNode):
 
     @property
     def transform(self):
-        mat = mobu.FBMatrix()
+        mat = native.FBMatrix()
         self._model.GetMatrix(mat)
         return _mat_to_tuple(mat)
 
@@ -75,6 +75,30 @@ class GeometricObject(base.BaseGeometricObject):
         g = self._model.Geometry
         if not g: return None
         return Mesh(g)
+
+class Camera(base.BaseCamera):
+    def __init__(self, cam):
+        self._cam = cam
+
+    @property
+    def is_ortho(self):
+        return False
+
+    @property
+    def field_of_view(self):
+        return self._cam.FieldOfView
+
+    @property
+    def aspect_ratio(self):
+        return self._cam.FilmAspectRatio
+
+    @property 
+    def near_clip(self):
+        return self._cam.NearPlaneDistance
+
+    @property
+    def far_clip(self):
+        return self._cam.FarPlaneDistance
 
 class Mesh(base.BaseMesh):
     def __init__(self, mesh):

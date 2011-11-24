@@ -40,11 +40,11 @@ class BaseApplication(object):
     def create_node(self, name='', parent=None):
         ''' Creates a new node in the scene graph '''
         return None        
-		
+
     @property
     def product(self):
         return "unknown"
-	
+
 class BaseNode(object):    
     ''' A node in the scene graph. '''
     
@@ -91,6 +91,37 @@ class BaseGeometricObject(object):
     def mesh(self):
         ''' Returns the associated triangle mesh '''
         return None
+
+class BaseCamera(object):
+    ''' A camera. '''
+    @property 
+    def is_ortho(self):
+        ''' Returns True or False if the camera is orthographic '''
+        raise NotImplementedError()
+
+    @property
+    def near_clip(self):
+        ''' Returns the near clip plane distance. '''
+        raise NotImplementedError()
+
+    @property
+    def far_clip(self):
+        ''' Returns the far clip plane distance. '''
+        raise NotImplementedError()
+
+    @property
+    def aspect_ratio(self):
+        ''' Returns the aspect ratio. '''
+        raise NotImplementedError()
+
+    @property
+    def field_of_view(self):
+        ''' Returns the field of view. '''
+        raise NotImplementedError()
+
+class BaseLight(object):
+    ''' A light. '''
+    pass
 
 class BaseMesh(object):                
     ''' A triangle mesh. '''

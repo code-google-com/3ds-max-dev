@@ -2,7 +2,7 @@
 # Copyright Autodesk
 # Licensed under the New BSD License
 
-import pymel.core as maya
+import pymel.core as native
 import base
 
 class Application(base.BaseApplication):
@@ -14,15 +14,15 @@ class Application(base.BaseApplication):
 
     @property
     def roots(self):
-        for x in maya.ls(tr=True):
+        for x in native.ls(tr=True):
             if x and not _parents(x):
                 yield Node(x)
         
     def load_file(self, fname):        
-        return maya.importFile(fname)
+        return native.importFile(fname)
         
     def save_file(self, fname):
-        return maya.saveAs(fname)
+        return native.saveAs(fname)
     
     @property
     def product(self):
@@ -34,7 +34,7 @@ class Node(base.BaseNode):
     
     @property
     def children(self):
-        for x in maya.listRelatives(self._node, type='transform'):
+        for x in native.listRelatives(self._node, type='transform'):
             if x:
                 yield Node(x)
 
@@ -44,11 +44,11 @@ class Node(base.BaseNode):
     
     @name.setter  
     def set_name(self, value):
-        maya.rename(self._node, value)
+        native.rename(self._node, value)
     
     @property
     def parent(self):
-        xs = maya.listRelatives(self._node, parent=True)
+        xs = native.listRelatives(self._node, parent=True)
         if len(xs) < 1: return None
         if not xs[0]: return None
         return Node(xs[0])
@@ -66,14 +66,14 @@ class Node(base.BaseNode):
 
     @property
     def selected(self):
-        return self._node in maya.selected()
+        return self._node in native.selected()
 
     @selected.setter
     def selected(self, value):
         if value:
-            maya.select(self._node, add=True)
+            native.select(self._node, add=True)
         else:
-            maya.select(self._node, deselect=True)
+            native.select(self._node, deselect=True)
                     
 class GeometricObject(base.BaseGeometricObject):
     def __init__(self, shape):        
@@ -89,12 +89,40 @@ class GeometricObject(base.BaseGeometricObject):
     
     @name.setter  
     def set_name(self, value):
-        maya.rename(self._shape, value)
+        native.rename(self._shape, value)
+
+class Camera(base.BaseCamera):
+    def __init__(self, cam):
+        self._cam = cam
+
+    @property
+    def is_ortho(self):
+        return False
+
+    @property
+    def field_of_view(self):
+        return self._cam.getHorizontalFieldOfView()
+
+    @property
+    def vertical_field_of_view(self):
+        return self._cam.getVerticalFieldOfView()
+
+    @property
+    def aspect_ratio(self):
+        return self._cam.getAspectRatio()
+
+    @property 
+    def near_clip(self):
+        return self._cam.getNearClipPlane()
+
+    @property
+    def far_clip(self):
+        return self._cam.getFarClipPlane()
 
 class Mesh(base.BaseMesh):              
     def __init__(self, mesh):
         # Should really do the triangulation in memory rather than changing the scene
-        maya.polyTriangulate(mesh)
+        native.polyTriangulate(mesh)
         self.vertices = tuple(tuple(v) for v in mesh.getPoints())
         self.indices = tuple(self._compute_indices(mesh))
         self.uvs = tuple(self._compute_uvs(mesh))
@@ -121,7 +149,7 @@ def _mat_to_tuple(m):
     return tuple(tuple(r) for r in m)
 
 def _parents(x):
-    return maya.listRelatives(x, parent=True)
+    return native.listRelatives(x, parent=True)
 
 ''' This is a singleton representing the application '''
 app = Application()

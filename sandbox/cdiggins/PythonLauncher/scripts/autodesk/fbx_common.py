@@ -2,7 +2,7 @@
 # Copyright Autodesk
 # Licensed under the New BSD License
 
-import fbx
+import fbx as native
 import FbxCommon 
 import base
 
@@ -22,11 +22,11 @@ class Application(base.BaseApplication):
     
     def shutdown(self):
         self._mgr.Destroy()
-		
-	@property
-	def product():
-		return "Autodesk FBX"		
-        
+
+    @property
+    def product():
+        return "Autodesk FBX"		
+
 class Node(base.BaseNode):
     def __init__(self, node):
         self._node = node
@@ -60,19 +60,19 @@ class Node(base.BaseNode):
         attr = self._node.GetNodeAttribute()
         if not attr: return None
         atype = attr.GetAttributeType()
-        if atype == fbx.KFbxNodeAttribute.eMESH:
+        if atype == native.KFbxNodeAttribute.eMESH:
             return GeometricObject(attr)
-        elif atype == fbx.KFbxNodeAttribute.eMARKER:
+        elif atype == native.KFbxNodeAttribute.eMARKER:
             return None # Marker(attr)
-        elif atype == fbx.KFbxNodeAttribute.eSKELETON:
+        elif atype == native.KFbxNodeAttribute.eSKELETON:
             return None #  Skeleton(attr)
-        elif atype == fbx.KFbxNodeAttribute.eNURB:
+        elif atype == native.KFbxNodeAttribute.eNURB:
             return None # Nurb(attr)
-        elif atype == fbx.KFbxNodeAttribute.ePATCH:
+        elif atype == native.KFbxNodeAttribute.ePATCH:
             return None # Patch(attr)
-        elif atype == fbx.KFbxNodeAttribute.eCAMERA:
+        elif atype == native.KFbxNodeAttribute.eCAMERA:
             return None # Camera(attr)
-        elif atype == fbx.KFbxNodeAttribute.eLIGHT:
+        elif atype == native.KFbxNodeAttribute.eLIGHT:
             return None # Light(attr)                
         else: 
             raise Exception('Unrecognized attribute type')
@@ -87,41 +87,46 @@ class GeometricObject(base.BaseGeometricObject):
 
 class Mesh(base.BaseMesh):                
     def __init__(self, m):        
-        self.faces = tuple(_get_faces(m))                
-        self.uvs = tuple(_get_uvs(m.GetLayer(0)))
+        self.indices = tuple(_get_indices(m))                
         self.vertices = tuple((x[0], x[1], x[2]) for x in m.GetControlPoints())
         self.normals = tuple(_get_normals(m))
+        self.uvs = tuple(_get_uvs(m, 0))
 
-def _get_faces(m):
-    for i in xrange(m.GetPolygonCount()):
-        poly_size = m.GetPolygonSize(i)
-        if poly_size == 3:
-            yield (m.GetPolygonVertex(i, 0), m.GetPolygonVertex(i, 1), m.GetPolygonVertex(i, 2))
-        elif poly_size == 4:
-            yield (m.GetPolygonVertex(i, 0), m.GetPolygonVertex(i, 1), m.GetPolygonVertex(i, 3))
-            yield (m.GetPolygonVertex(i, 1), m.GetPolygonVertex(i, 2), m.GetPolygonVertex(i, 3))
-        else:
-            raise Exception('Only triangle and quad meshes are supported') 
+    def _get_indices(m):
+        for i in xrange(m.GetPolygonCount()):
+            poly_size = m.GetPolygonSize(i)
+            for j in xrange(1, poly_size-1):
+                yield (m.GetPolygonVertex(i, 0), m.GetPolygonVertex(i, j), m.GetPolygonVertex(i, j + 1))
 
-def _get_uvs(layer):        
-    # TODO: finish
-    return _
+    def _get_normals(m):
+        for i in xrange(m.GetPolygonCount()):
+            poly_size = m.GetPolygonSize(i)
+            for j in xrange(1, poly_size-1):
+                yield (m.GetPolygonVertex(i, 0), m.GetPolygonVertex(i, j), m.GetPolygonVertex(i, j + 1))
+
+    def _get_uvs(m, nlayer):        
+        layer = m.GetElementUV(nlayer)
+        for i in xrange(m.GetPolygonCount()):
+            poly_size = m.GetPolygonSize(i)
+            for j in xrange(1, poly_size-1):
+                if layer.GetMappingMode() == KFbxLayerElement.eBY_CONTROL_POINT:
+                    index = m.GetPolygonVertex(i, j)
+                    uv = _get_layer_element_at(layer, index)
+                    yield (uv[0], uv[1])
+                elif layer.GetMappingMode() ==  KFbxLayerElement.eBY_POLYGON_VERTEX:
+                    index = m.GetTextureUVIndex(i, j)
+                    uv = _get_layer_element_at(layer, index)
+                    yield (uv[0], uv[1])
+                else:
+                    raise Exception('Unrecognized method of storing UV coordinates')        
     
-def _get_layer_array(layer):    
-    direct = layer.GetDirectArray()
-    if layer.GetReferenceMode() == KFbxLayerElement.eDIRECT:
-        return direct
-    else: 
-        indices = layer.GetIndexArray
-        return (direct[i] for i in indices)    
+    def _get_layer_element_at(layer, index):    
+        if layer.GetReferenceMode() == KFbxLayerElement.eDIRECT:
+            return layer.GetDirectArray().GetAt(index)
+        else: 
+            id = layer.GetIndexArray().GetAt(index)
+            return layer.GetDirectArray().GetAt(id)
     
-def _get_normals(m):
-    ns = None
-    if not m.GetPolygonVertexNormals
-    for i in xrange(m.GetPolygonVertexCount()):
-        for j in xrange(3):
-            m.GetPolygonVertexNormal(i, j, n)
-            yield (n[0], n[1], n[2])
 
 def _mat_to_tuple(m):
     return tuple(tuple(r) for r in m)

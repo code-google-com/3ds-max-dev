@@ -1,7 +1,7 @@
 # Load the .NET API from 3ds Max 
 import clr
 clr.AddReference("Autodesk.Max")
-import Autodesk.Max
+import Autodesk.Max as native
 
 # Load your local instance of Python 2.6
 import sys
@@ -12,7 +12,7 @@ import base
 
 class Application(base.BaseApplication):
     def __init__(self):
-        self._g = Autodesk.Max.GlobalInterface.Instance
+        self._g = native.GlobalInterface.Instance
         self._i = self._g.COREInterface13    
 
     def write_line(self, text):
@@ -26,7 +26,7 @@ class Application(base.BaseApplication):
     @property
     def product(self):
         return "Autodesk 3ds Max"    
-		
+
 class Node(base.BaseNode):
     def __init__(self, inode):
         self._node = inode
@@ -80,6 +80,32 @@ class GeometricObject(base.BaseGeometricObject):
     def name(self):
         return self._object.ObjectName
 
+class Camera(base.BaseCamera):
+    def __init__(self, cam):
+        self._cam = cam
+        self._state = native.IGlobal.IGlobalCameraState.Create()
+        cam.EvalCameraState(_now(), _interval(), self._state)
+        
+    @property
+    def is_ortho(self):
+        return self._state.IsOrtho
+
+    @property
+    def field_of_view(self):
+        return self._state.Fov
+
+    @property
+    def aspect_ratio(self):
+        return 1.0
+
+    @property 
+    def near_clip(self):
+        return self._state.Hither
+
+    @property
+    def far_clip(self):
+        return self._state.Yon
+
 class Mesh(base.BaseMesh):                
     def __init__(self, m):
         m.BuildNormals()
@@ -121,6 +147,10 @@ def _obj_to_mesh(obj, time):
     
 def _now():
     return app._i.Time
+
+def _interval():
+    return native.IGlobal.IGlobalInterval.Create()
+
         
 # Singleton instance of the Application object 
 app = Application()
