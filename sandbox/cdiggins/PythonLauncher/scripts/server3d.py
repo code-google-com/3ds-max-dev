@@ -74,4 +74,5 @@ def serve(port=8000):
         httpd.handle_request()
     httpd.server_close()
 
-
+if __name__ == '__main__':
+    serve()
