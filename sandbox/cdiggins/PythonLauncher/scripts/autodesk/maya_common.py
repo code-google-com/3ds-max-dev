@@ -1,11 +1,8 @@
-# Written by Christopher Diggins
-# Copyright Autodesk
-# Licensed under the New BSD License
-
 import pymel.core as native
 import base
+import maya
 
-class Application(base.BaseApplication):
+class Application(base.Application):
     def __init__(self):
         pass
         
@@ -27,8 +24,25 @@ class Application(base.BaseApplication):
     @property
     def product(self):
         return "Autodesk Maya"    
+
+    def add_geometry(self, vertices, indices, name):
+        mesh = maya.OpenMaya.MFnMesh()
+        nverts = len(vertices)
+        nfaces = len(indices) / 3        
+        mvertices = maya.OpenMaya.MFloatPointArray(nvers)
+        for i in xrange(nverts):
+            v = vertices[i]
+            mvertices.set(i, v[0], v[1], v[2])
+        mconnects = maya.OpenMaya.MIntArray(nfaces)
+        for i in xrange(nfaces):
+            mconnects.set(i, indices[i])
+        mcounts = maya.OpenMaya.MIntArray(nfaces, 3)
+        mesh.create(nverts, nfaces, mvertices, mcounts, mvertices)
+        node = Node(mesh)
+        node.name = name
+        return node
         
-class Node(base.BaseNode):
+class Node(base.Node):
     def __init__(self, node):
         self._node = node        
     
@@ -75,7 +89,7 @@ class Node(base.BaseNode):
         else:
             native.select(self._node, deselect=True)
                     
-class GeometricObject(base.BaseGeometricObject):
+class GeometricObject(base.GeometricObject):
     def __init__(self, shape):        
         self._shape = shape
         
@@ -91,7 +105,7 @@ class GeometricObject(base.BaseGeometricObject):
     def set_name(self, value):
         native.rename(self._shape, value)
 
-class Camera(base.BaseCamera):
+class Camera(base.Camera):
     def __init__(self, cam):
         self._cam = cam
 
@@ -119,7 +133,7 @@ class Camera(base.BaseCamera):
     def far_clip(self):
         return self._cam.getFarClipPlane()
 
-class Mesh(base.BaseMesh):              
+class Mesh(base.Mesh):              
     def __init__(self, mesh):
         # Should really do the triangulation in memory rather than changing the scene
         native.polyTriangulate(mesh)

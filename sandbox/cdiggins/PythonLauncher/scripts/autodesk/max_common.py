@@ -10,7 +10,7 @@ sys.path.append("C:\Python26\Lib")
 # Load the base classes.
 import base
 
-class Application(base.BaseApplication):
+class Application(base.Application):
     def __init__(self):
         self._g = native.GlobalInterface.Instance
         self._i = self._g.COREInterface13    
@@ -27,7 +27,7 @@ class Application(base.BaseApplication):
     def product(self):
         return "Autodesk 3ds Max"    
 
-class Node(base.BaseNode):
+class Node(base.Node):
     def __init__(self, inode):
         self._node = inode
     
@@ -68,7 +68,7 @@ class Node(base.BaseNode):
         if obj == None: return None
         return GeometricObject(obj)
 
-class GeometricObject(base.BaseGeometricObject):
+class GeometricObject(base.GeometricObject):
     def __init__(self, e):
         self._object = e
         
@@ -80,7 +80,7 @@ class GeometricObject(base.BaseGeometricObject):
     def name(self):
         return self._object.ObjectName
 
-class Camera(base.BaseCamera):
+class Camera(base.Camera):
     def __init__(self, cam):
         self._cam = cam
         self._state = native.IGlobal.IGlobalCameraState.Create()
@@ -106,7 +106,7 @@ class Camera(base.BaseCamera):
     def far_clip(self):
         return self._state.Yon
 
-class Mesh(base.BaseMesh):                
+class Mesh(base.Mesh):                
     def __init__(self, m):
         m.BuildNormals()
         self.indices = tuple(self._compute_indices(m))

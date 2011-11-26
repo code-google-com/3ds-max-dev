@@ -1,12 +1,8 @@
-# Written by Christopher Diggins
-# Copyright Autodesk
-# Licensed under the New BSD License
-
 import fbx as native
 import FbxCommon 
 import base
 
-class Application(base.BaseApplication):
+class Application(base.Application):
     def __init__(self):
         (self._mgr, self._scene) = FbxCommon.InitializeSdkObjects()
 
@@ -27,7 +23,7 @@ class Application(base.BaseApplication):
     def product():
         return "Autodesk FBX"		
 
-class Node(base.BaseNode):
+class Node(base.Node):
     def __init__(self, node):
         self._node = node
         self.selected = False
@@ -77,7 +73,7 @@ class Node(base.BaseNode):
         else: 
             raise Exception('Unrecognized attribute type')
                         
-class GeometricObject(base.BaseGeometricObject):
+class GeometricObject(base.GeometricObject):
     def __init__(self, attr):
         self._attr = attr
         
@@ -85,7 +81,7 @@ class GeometricObject(base.BaseGeometricObject):
     def mesh(self):
         return Mesh(self._attr)
 
-class Mesh(base.BaseMesh):                
+class Mesh(base.Mesh):                
     def __init__(self, m):        
         self.indices = tuple(_get_indices(m))                
         self.vertices = tuple((x[0], x[1], x[2]) for x in m.GetControlPoints())

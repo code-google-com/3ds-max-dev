@@ -1,5 +1,5 @@
 '''
-    This module contains the base classes of the object model. 
+    This module contains the  classes of the object model. 
     It is useful to know what what attributes (properties, fields, and methods)
     a particular object will provide. 
     
@@ -7,8 +7,11 @@
     of existing functions. 
 '''
 
-class BaseApplication(object):
+class Application(object):
     ''' Represents an application. Only one instance should be created. '''     
+
+    # The following functions should be overridden. 
+    
     def write_line(self, text):
         ''' Outputs a line of text to the console ''' 
         print(text)
@@ -27,9 +30,25 @@ class BaseApplication(object):
     
     @property
     def roots(self):
-        ''' Returns the list root nodes in the scene. ''' 
-        return ()
+        ''' Returns the root (unparented) nodes in the scene. ''' 
+        raise NotImplementedError()
         
+    def create_node(self, name='', parent=None):
+        ''' Creates a new node in the scene graph '''
+        return None        
+
+    @property
+    def product(self):
+        ''' Returns a string identifying the product API. '''
+        return "unknown"
+
+    def add_geometry(self, vertices, indices, name):
+        ''' Creates a new node associated with the given geometry. '''
+        raise NotImplementedError()
+
+    # The following properties and functions are defined in terms of the overridden
+    # functions and properties. 
+
     @property
     def tree(self):
         ''' All nodes in the scene in depth first order. '''
@@ -37,15 +56,27 @@ class BaseApplication(object):
             for node in root.tree:
                 yield node
 
-    def create_node(self, name='', parent=None):
-        ''' Creates a new node in the scene graph '''
-        return None        
+    @property 
+    def first_root(self):
+        ''' Returns the first root node.'''
+        for r in self.roots:
+            return r
+        return None
 
-    @property
-    def product(self):
-        return "unknown"
+    @property 
+    def selected(self):
+        ''' Returns all selected nodes. '''
+        return (x for x in self.scene_tree if x.selected)
 
-class BaseNode(object):    
+    @property 
+    def first_selected(self):
+        ''' Returns the first selected node. '''
+        for r in self.scene_tree:
+            if r.selected:
+                return r
+        return None
+
+class Node(object):    
     ''' A node in the scene graph. '''
     
     @property
@@ -84,7 +115,7 @@ class BaseNode(object):
         ''' Removes (detaches) a child node ''' 
         raise NotImplementedError()
 
-class BaseGeometricObject(object):
+class GeometricObject(object):
     ''' An element of the scene with a geometric representation. '''
     
     @property 
@@ -92,7 +123,7 @@ class BaseGeometricObject(object):
         ''' Returns the associated triangle mesh '''
         return None
 
-class BaseCamera(object):
+class Camera(object):
     ''' A camera. '''
     @property 
     def is_ortho(self):
@@ -119,10 +150,10 @@ class BaseCamera(object):
         ''' Returns the field of view. '''
         raise NotImplementedError()
 
-class BaseLight(object):
+class Light(object):
     ''' A light. '''
     pass
 
-class BaseMesh(object):                
+class Mesh(object):                
     ''' A triangle mesh. '''
     pass    

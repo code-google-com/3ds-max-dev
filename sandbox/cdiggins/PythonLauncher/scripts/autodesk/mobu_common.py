@@ -1,7 +1,7 @@
 import base
 import pyfbsdk as native
 
-class Application(base.BaseApplication):
+class Application(base.Application):
     def __init__(self):
         self._system = native.FBSystem()
 
@@ -32,7 +32,7 @@ class Application(base.BaseApplication):
         model.Show = True
         return model        
         
-class Node(base.BaseNode):
+class Node(base.Node):
     def __init__(self, model):
         self._model = model
 
@@ -66,7 +66,7 @@ class Node(base.BaseNode):
     def element(self):
         return GeometricObject(self._model)
 
-class GeometricObject(base.BaseGeometricObject):
+class GeometricObject(base.GeometricObject):
     def __init__(self, model):
         self._model = model
 
@@ -76,7 +76,7 @@ class GeometricObject(base.BaseGeometricObject):
         if not g: return None
         return Mesh(g)
 
-class Camera(base.BaseCamera):
+class Camera(base.Camera):
     def __init__(self, cam):
         self._cam = cam
 
@@ -100,7 +100,7 @@ class Camera(base.BaseCamera):
     def far_clip(self):
         return self._cam.FarPlaneDistance
 
-class Mesh(base.BaseMesh):
+class Mesh(base.Mesh):
     def __init__(self, mesh):
         self.vertices = tuple(tuple(mesh.VertexGet(i)) for i in xrange(mesh.VertexCount()))
         self.indices = tuple(self._compute_indices(mesh))
