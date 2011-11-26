@@ -27,20 +27,18 @@ class Application(base.Application):
 
     def add_geometry(self, vertices, indices, name):
         mesh = maya.OpenMaya.MFnMesh()
-        nverts = len(vertices)
-        nfaces = len(indices) / 3        
-        mvertices = maya.OpenMaya.MFloatPointArray(nvers)
-        for i in xrange(nverts):
-            v = vertices[i]
-            mvertices.set(i, v[0], v[1], v[2])
-        mconnects = maya.OpenMaya.MIntArray(nfaces)
-        for i in xrange(nfaces):
-            mconnects.set(i, indices[i])
-        mcounts = maya.OpenMaya.MIntArray(nfaces, 3)
-        mesh.create(nverts, nfaces, mvertices, mcounts, mvertices)
-        node = Node(mesh)
-        node.name = name
-        return node
+        mvertices = maya.OpenMaya.MFloatPointArray()
+        for v in vertices:
+            mv = maya.OpenMaya.MFloatPoint(v[0], v[1], v[2]) 
+            mvertices.append(mv)
+        mcounts = maya.OpenMaya.MIntArray()
+        for i in xrange(len(indices) / 3):
+            mcounts.append(3)
+        mindices = maya.OpenMaya.MIntArray()
+        for i in indices:
+            mindices.append(i)
+        node = mesh.create(mvertices.length(), mcounts.length(), mvertices, mcounts, mindices)
+        return Node(node)
         
 class Node(base.Node):
     def __init__(self, node):
@@ -135,7 +133,8 @@ class Camera(base.Camera):
 
 class Mesh(base.Mesh):              
     def __init__(self, mesh):
-        # Should really do the triangulation in memory rather than changing the scene
+        # HACK: I should really do the triangulation in memory rather than changing the scene.
+        # However, this is fine for now. 
         native.polyTriangulate(mesh)
         self.vertices = tuple(tuple(v) for v in mesh.getPoints())
         self.indices = tuple(self._compute_indices(mesh))

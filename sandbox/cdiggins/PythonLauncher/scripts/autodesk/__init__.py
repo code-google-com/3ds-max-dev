@@ -30,7 +30,7 @@ def root():
     
 def selected():
     ''' Returns the first selected node in a scene. '''
-    for n in app.scene_tree:
+    for n in app.tree:
         if n.selected: 
             return n
     return None
@@ -41,7 +41,7 @@ def output_node_tree(f, n, s=""):
     for n2 in n.children:
        output_node_tree(f, n2, s + "  ")
 
-def output_scene_tree(f = sys.stdout):    
+def output_tree(f = sys.stdout):    
     ''' Outputs all node names in a scene as a tree. '''
     for n in app.roots:
         output_node_tree(f, n)     

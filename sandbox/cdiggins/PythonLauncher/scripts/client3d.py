@@ -2,7 +2,7 @@ import json
 import urllib2
 import autodesk
 
-def get_mesh_over_http(port = 8000, host = 'http://localhost'):    
+def get_mesh(port = 8000, host = 'http://localhost'):    
     # Open a URL 
     f = urllib2.urlopen(host + ':' + str(port) + '/mesh')   
     # Read the data 
@@ -14,4 +14,5 @@ def get_mesh_over_http(port = 8000, host = 'http://localhost'):
     # Add the geometry to the scene.
     return autodesk.common.app.add_geometry(dict['vertices'], dict['indices'], 'ImportedGeometry')
 
-
+if __name__ == '__main__':
+    get_mesh()

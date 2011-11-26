@@ -66,12 +66,12 @@ class Application(object):
     @property 
     def selected(self):
         ''' Returns all selected nodes. '''
-        return (x for x in self.scene_tree if x.selected)
+        return (x for x in self.tree if x.selected)
 
     @property 
     def first_selected(self):
         ''' Returns the first selected node. '''
-        for r in self.scene_tree:
+        for r in self.tree:
             if r.selected:
                 return r
         return None
