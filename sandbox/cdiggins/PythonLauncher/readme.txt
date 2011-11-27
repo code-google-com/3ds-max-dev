@@ -9,6 +9,4 @@ This project creates a custom user action for launching Python scripts.
 The next time you run 3ds Max 2012 you will need to open up the Customization dialog and look for the 
 command "Run Python script" in the category ".NET Utilities". 
 
-The included script (scripts\Adsk3dsMax.py) require that you have 3ds Max 2012 with the 
-subscription advantage pack installed.  
-
+To test the system try running the script "scripts/output_scene.py"

@@ -2,6 +2,7 @@ import autodesk
 import sys
 import BaseHTTPServer
 import SocketServer
+import socket
 
 class Handler(BaseHTTPServer.BaseHTTPRequestHandler):          
     ''' Responds to HTTP requests. '''
@@ -35,6 +36,8 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_GET(self):
         ''' Respond to a "GET" request.  '''
         try:
+            autodesk.write_line('GET request: ' + self.path)
+
             # Send headers, but abort if not successful.
             if not self.send_headers():
                 return                        
@@ -68,11 +71,17 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
             Handler.shutting_down = True            
                         
 def serve(port=8000):
-    ''' Launches the server on the specified port. '''        
+    ''' Launches the server on the specified port. '''
+    autodesk.write_line('Opening connection at on port ' + str(port))        
     httpd = SocketServer.TCPServer(("", port), Handler)    
-    while not Handler.shutting_down:
-        httpd.handle_request()
-    httpd.server_close()
+    httpd.timeout = 0.2
+    try:
+        while not Handler.shutting_down:
+            httpd.handle_request()
+            autodesk.app.process_tasks()
+    finally:
+        autodesk.write_line('Shutting down server')
+        httpd.server_close()
 
 if __name__ == '__main__':
     serve()

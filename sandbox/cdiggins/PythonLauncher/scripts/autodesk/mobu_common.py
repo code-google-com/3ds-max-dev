@@ -56,11 +56,11 @@ class Node(base.Node):
 
     @property
     def selected(self):
-        return self._model.Select
+        return self._model.Selected
 
     @selected.setter
     def set_selected(self, value):
-        self._model.Select = value
+        self._model.Selected = value
 
     @property
     def element(self):

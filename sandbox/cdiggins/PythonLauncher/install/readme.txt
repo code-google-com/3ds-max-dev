@@ -1,0 +1,1 @@
+These files must be copied to the root installation folder of 3ds Max 2012. 

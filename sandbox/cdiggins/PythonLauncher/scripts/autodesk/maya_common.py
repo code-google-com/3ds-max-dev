@@ -1,6 +1,7 @@
 import pymel.core as native
 import base
 import maya
+import maya.utils
 
 class Application(base.Application):
     def __init__(self):
@@ -167,3 +168,5 @@ def _parents(x):
 ''' This is a singleton representing the application '''
 app = Application()
 
+def _do_nothing():
+    pass

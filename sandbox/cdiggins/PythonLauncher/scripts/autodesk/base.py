@@ -27,6 +27,10 @@ class Application(object):
     def shutdown(self):
         ''' Shuts down the host application. '''
         pass        
+
+    def process_tasks(self):
+        ''' Returns control to the host application to process pending UI tasks. '''
+        pass
     
     @property
     def roots(self):

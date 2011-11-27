@@ -3,11 +3,7 @@ import clr
 clr.AddReference("Autodesk.Max")
 import Autodesk.Max as native
 
-# Load your local instance of Python 2.6
-import sys
-sys.path.append("C:\Python26\Lib")
-
-# Load the base classes.
+# Load the module containing the base classes.
 import base
 
 class Application(base.Application):
@@ -27,6 +23,9 @@ class Application(base.Application):
     def product(self):
         return "Autodesk 3ds Max"    
 
+    def process_tasks(self):
+        self._i.CheckMAXMessages
+    
 class Node(base.Node):
     def __init__(self, inode):
         self._node = inode
