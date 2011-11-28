@@ -6,9 +6,6 @@ class Application(base.Application):
     def __init__(self):
         (self._mgr, self._scene) = FbxCommon.InitializeSdkObjects()
 
-    def write_line(self, text):
-        print text
-
     @property
     def roots(self):
         yield Node(self._scene.GetRootNode())   
@@ -92,13 +89,21 @@ class Mesh(base.Mesh):
         for i in xrange(m.GetPolygonCount()):
             poly_size = m.GetPolygonSize(i)
             for j in xrange(1, poly_size-1):
-                yield (m.GetPolygonVertex(i, 0), m.GetPolygonVertex(i, j), m.GetPolygonVertex(i, j + 1))
+                yield m.GetPolygonVertex(i, 0)
+                yield m.GetPolygonVertex(i, j)
+                yield m.GetPolygonVertex(i, j + 1)
 
     def _get_normals(m):
+        v = fbx.KFbxVector4()
         for i in xrange(m.GetPolygonCount()):
             poly_size = m.GetPolygonSize(i)
             for j in xrange(1, poly_size-1):
-                yield (m.GetPolygonVertex(i, 0), m.GetPolygonVertex(i, j), m.GetPolygonVertex(i, j + 1))
+                m.GetPolygonVertex(i, 0, v)
+                yield (v[0], v[1], v[2])
+                m.GetPolygonVertex(i, j, v)
+                yield (v[0], v[1], v[2])
+                m.GetPolygonVertex(i, j + 1, v)
+                yield (v[0], v[1], v[2])
 
     def _get_uvs(m, nlayer):        
         layer = m.GetElementUV(nlayer)

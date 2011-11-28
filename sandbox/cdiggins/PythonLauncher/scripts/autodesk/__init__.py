@@ -57,6 +57,9 @@ def node_as_dict(node):
 
 def selected_mesh_json():
     ''' Converts the first selected mesh into a JSON representation '''
+    sel = app.first_selected
+    if not sel:
+        return '{}'
     return json.dumps(app.first_selected.element.mesh.__dict__)
 
 def scene_json():
