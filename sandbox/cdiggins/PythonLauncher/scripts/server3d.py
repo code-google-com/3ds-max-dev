@@ -8,6 +8,7 @@ import traceback
 import StringIO
 import urlparse
 import json
+import os
 
 ##########################################################################
 # Functions
@@ -148,7 +149,8 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         # Return an HTML file 
         elif '/demo' == path:
-            source = open('C:\demos\webGL\demo.html', 'rb')
+            fname = os.path.dirname(__file__) + "\\demo.html"
+            source = open(fname, 'rb')
             mimetype = 'text/html'
             shutil.copyfileobj(source, content)
             source.close()
