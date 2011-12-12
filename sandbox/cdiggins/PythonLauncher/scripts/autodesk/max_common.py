@@ -115,14 +115,15 @@ class Mesh(base.Mesh):
 
     def _compute_indices(self, m):
         for f in m.Faces:
-            for v in f.V:
-                yield int(v)
+            yield int(f.V[0])
+            yield int(f.V[1])
+            yield int(f.V[2])
 
     def _compute_normals(self, m):
         for i in xrange(m.NumFaces):
-            yield _point3_to_tuple(m.FaceNormal(i, False)) 
-            yield _point3_to_tuple(m.FaceNormal(i, False)) 
-            yield _point3_to_tuple(m.FaceNormal(i, False)) 
+            yield _normal_to_tuple(m.FaceNormal(i, True)) 
+            yield _normal_to_tuple(m.FaceNormal(i, True)) 
+            yield _normal_to_tuple(m.FaceNormal(i, True)) 
         
     def _compute_uvs(self, m):
         for f in m.TvFace:
@@ -133,6 +134,9 @@ class Mesh(base.Mesh):
 def _point3_to_tuple(p):
     return (float(p.X), float(p.Y), float(p.Z))
 
+def _normal_to_tuple(n):
+    return (float(n.X), float(n.Y), float(n.Z))
+    
 def _matrix_to_tuple(mat):
     return tuple(_point3_to_tuple(mat.GetRow(i)) for i in xrange(4))
 

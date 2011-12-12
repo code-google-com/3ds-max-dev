@@ -159,5 +159,11 @@ class Light(object):
     pass
 
 class Mesh(object):                
-    ''' A triangle mesh. '''
+    ''' A triangular mesh. Contains the following member variables:
+          * vertices - Tuple of 3d points representing control points.
+          * indices - Tuple of indices into the vertices array, ordered by face and polygon-vertex.
+          * normals - Tuple of 3d-vectors representing each face-vertex normal, ordered by face and polygon-vertex.
+          * uvs - Tuple of 2d points representing UV coordinates, ordered by face and polygon-vertex. 
+    '''
+
     pass    

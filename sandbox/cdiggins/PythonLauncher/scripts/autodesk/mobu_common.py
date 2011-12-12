@@ -102,10 +102,20 @@ class Camera(base.Camera):
 
 class Mesh(base.Mesh):
     def __init__(self, mesh):
-        self.vertices = tuple(tuple(mesh.VertexGet(i)) for i in xrange(mesh.VertexCount()))
+        self.vertices = tuple(_vector4_to_tuple(mesh.VertexGet(i)) for i in xrange(mesh.VertexCount()))
         self.indices = tuple(self._compute_indices(mesh))
         self.uvs = tuple(tuple(mesh.VertexUVGet(i)) for i in self.indices)
-        self.normals = tuple(tuple(mesh.VertexNormalGet(i)) for i in self.indices)
+        self.normals = tuple(self._compute_normals(mesh))
+
+    def _compute_normals(self, m):
+        j = 0
+        for f in xrange(m.PolygonCount()):
+            n = m.PolygonVertexCount(f)
+            for i in xrange(1, n - 1):
+                yield _vector4_to_tuple(m.VertexNormalGet(j))
+                yield _vector4_to_tuple(m.VertexNormalGet(j + i))
+                yield _vector4_to_tuple(m.VertexNormalGet(j + i + 1))
+            j = j + n
         
     def _compute_indices(self, m):
         for f in xrange(m.PolygonCount()):
@@ -114,6 +124,10 @@ class Mesh(base.Mesh):
                 yield m.PolygonVertexIndex(f, 0)
                 yield m.PolygonVertexIndex(f, i)
                 yield m.PolygonVertexIndex(f, i + 1) 
+    
+                
+def _vector4_to_tuple(v):
+    return (v[0], v[1], v[2])
 
 def _mat_row(mat, row):
     return tuple(mat[row * 4 + i] for i in xrange(4))

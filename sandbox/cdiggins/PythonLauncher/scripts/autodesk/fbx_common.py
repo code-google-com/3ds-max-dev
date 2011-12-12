@@ -17,7 +17,7 @@ class Application(base.Application):
         self._mgr.Destroy()
 
     @property
-    def product():
+    def product(self):
         return "Autodesk FBX"		
 
 class Node(base.Node):
@@ -80,12 +80,12 @@ class GeometricObject(base.GeometricObject):
 
 class Mesh(base.Mesh):                
     def __init__(self, m):        
-        self.indices = tuple(_get_indices(m))                
+        self.indices = tuple(self._get_indices(m))                
         self.vertices = tuple((x[0], x[1], x[2]) for x in m.GetControlPoints())
-        self.normals = tuple(_get_normals(m))
-        self.uvs = tuple(_get_uvs(m, 0))
+        self.normals = tuple(self._get_normals(m))
+        self.uvs = tuple(self._get_uvs(m, 0))
 
-    def _get_indices(m):
+    def _get_indices(self, m):
         for i in xrange(m.GetPolygonCount()):
             poly_size = m.GetPolygonSize(i)
             for j in xrange(1, poly_size-1):
@@ -93,42 +93,47 @@ class Mesh(base.Mesh):
                 yield m.GetPolygonVertex(i, j)
                 yield m.GetPolygonVertex(i, j + 1)
 
-    def _get_normals(m):
-        v = fbx.KFbxVector4()
+    def _get_normals(self, m):
+        v = native.KFbxVector4()
         for i in xrange(m.GetPolygonCount()):
             poly_size = m.GetPolygonSize(i)
-            for j in xrange(1, poly_size-1):
-                m.GetPolygonVertex(i, 0, v)
+            for j in xrange(1, poly_size-1):                
+                m.GetPolygonVertexNormal(i, 0, v)
                 yield (v[0], v[1], v[2])
-                m.GetPolygonVertex(i, j, v)
+                m.GetPolygonVertexNormal(i, j, v)
                 yield (v[0], v[1], v[2])
-                m.GetPolygonVertex(i, j + 1, v)
+                m.GetPolygonVertexNormal(i, j + 1, v)
                 yield (v[0], v[1], v[2])
 
-    def _get_uvs(m, nlayer):        
-        layer = m.GetElementUV(nlayer)
+    def _get_uvs(self, m, nlayer):        
+        layer = m.GetLayer(nlayer).GetUVs()
         for i in xrange(m.GetPolygonCount()):
             poly_size = m.GetPolygonSize(i)
             for j in xrange(1, poly_size-1):
-                if layer.GetMappingMode() == KFbxLayerElement.eBY_CONTROL_POINT:
-                    index = m.GetPolygonVertex(i, j)
-                    uv = _get_layer_element_at(layer, index)
+                if layer.GetMappingMode() == native.KFbxLayerElement.eBY_CONTROL_POINT:
+                    uv = self._get_layer_element_at(layer, m.GetPolygonVertex(i, 0))
                     yield (uv[0], uv[1])
-                elif layer.GetMappingMode() ==  KFbxLayerElement.eBY_POLYGON_VERTEX:
-                    index = m.GetTextureUVIndex(i, j)
-                    uv = _get_layer_element_at(layer, index)
+                    uv = self._get_layer_element_at(layer, m.GetPolygonVertex(i, j))
+                    yield (uv[0], uv[1])
+                    uv = self._get_layer_element_at(layer, m.GetPolygonVertex(i, j+1))
+                    yield (uv[0], uv[1])
+                elif layer.GetMappingMode() == native.KFbxLayerElement.eBY_POLYGON_VERTEX:
+                    uv = self._get_layer_element_at(layer, m.GetTextureUVIndex(i, 0))
+                    yield (uv[0], uv[1])
+                    uv = self._get_layer_element_at(layer, m.GetTextureUVIndex(i, j))
+                    yield (uv[0], uv[1])
+                    uv = self._get_layer_element_at(layer, m.GetTextureUVIndex(i, j+1))
                     yield (uv[0], uv[1])
                 else:
                     raise Exception('Unrecognized method of storing UV coordinates')        
     
-    def _get_layer_element_at(layer, index):    
-        if layer.GetReferenceMode() == KFbxLayerElement.eDIRECT:
+    def _get_layer_element_at(self, layer, index):    
+        if layer.GetReferenceMode() == native.KFbxLayerElement.eDIRECT:
             return layer.GetDirectArray().GetAt(index)
         else: 
             id = layer.GetIndexArray().GetAt(index)
             return layer.GetDirectArray().GetAt(id)
     
-
 def _mat_to_tuple(m):
     return tuple(tuple(r) for r in m)
 
