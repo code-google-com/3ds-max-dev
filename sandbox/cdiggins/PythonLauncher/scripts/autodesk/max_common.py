@@ -25,7 +25,138 @@ class Application(base.Application):
 
     def process_tasks(self):
         self._i.CheckMAXMessages
-    
+
+    @property
+    def menu(self):
+        return Menu(self._i.MenuManager)
+
+    @property
+    def actions(self):
+        return Actions(self._i.ActionManager)
+         
+class Action(object):
+    def __init__(self, action):
+        self._action = action
+
+    def execute(self):
+        self._action.ExecuteAction()
+
+    @property
+    def name(self):
+        s = ''
+        self._action.GetButtonText(s)
+        return s
+
+    @property
+    def alt_name(self):
+        s = ''
+        self._action.GetMenuText(s)
+        return s
+  
+    @property
+    def enabled(self):
+        return self._action.IsEnabled
+
+    @property
+    def checked(self):
+        return self._action.IsChecked
+
+    @property
+    def description(self):
+        s = ''
+        self._action.GetDescription(s)
+        return s
+
+    @property 
+    def category(self):
+        s = ''
+        self._action.GetCategory(s)
+        return s
+
+    @property
+    def id(self):
+        return self._action.Id()
+
+class PropertyDescriptor(object):
+    def __init__(self, paramdef):
+        self._paramdef = paramdef
+
+    @property
+    def name(self):
+        return self._params.GetLocalName(self._id)
+
+    @property
+    def ascii_name(self):
+        return ''
+
+    @property
+    def has_limits(self):
+        return False
+
+    @property
+    def has_default(self):
+        return False
+
+    @property
+    def get_limits(self):
+        return (None, None)
+
+    @property
+    def get_default(self):
+        return (None)
+
+    @property
+    def dimension_name(self):
+        return self._paramdef.dim.DimensionName
+
+    @property
+    def validate(self, Value):
+        return True
+
+    @property
+    def description(self):
+        return self._paramdef.dim.DimensionName
+
+class PropertySet(object):
+    def __init__(self, params):
+        self._params = params
+
+    def __getitem__(self, index):
+        return self._params[index]
+
+    def __setitem__(self, index, value):
+        self._params[index] = value
+
+    @property 
+    def __len__(self):
+        return self._params.Count       
+
+    def get_descriptor(self, index):
+        return None
+
+class Menu(object):
+    def __init__(self, menu):
+        self._menu = menu
+
+    def actions(self):
+        for i in xrange(self._menu.numItems):
+            yield self._menu.GetItem(i).actionItem
+
+    @property
+    def title(self):
+        return self._menu.Title
+
+class Actions(object):
+    def __init__(self, action_mgr):
+        self._mgr = action_mgr
+
+    @property
+    def actions(self):
+        for i in xrange(action_mgr.NumActionTables):
+            table = action_mgr.GetTable(i)
+            for j in table.Count:
+                yield table[j]
+
 class Node(base.Node):
     def __init__(self, inode):
         self._node = inode

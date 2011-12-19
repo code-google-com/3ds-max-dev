@@ -14,6 +14,9 @@ def shutdown():
 def say_hello(s):
     autodesk.write_line("Hello")
 
+# All objects 
+objects = {} 
+
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 
@@ -24,6 +27,8 @@ server = SimpleXMLRPCServer.SimpleXMLRPCServer(('localhost', 9000), logRequests=
 server.register_function(list_contents)
 server.register_function(shutdown)
 server.register_function(say_hello)
+
+# Register 
 
 def serve():
     server.serve_forever()

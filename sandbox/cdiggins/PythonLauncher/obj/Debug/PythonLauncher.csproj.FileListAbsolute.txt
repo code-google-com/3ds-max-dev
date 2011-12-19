@@ -1,6 +1,0 @@
-C:\Program Files\Autodesk\3ds Max 2012\bin\assemblies\PythonLauncher.dll
-C:\svn\3ds-max-dev\sandbox\cdiggins\PythonLauncher\obj\Debug\ResolveAssemblyReference.cache
-C:\svn\3ds-max-dev\sandbox\cdiggins\PythonLauncher\obj\Debug\PythonLauncher.dll
-C:\svn\3ds-max-dev\sandbox\cdiggins\PythonLauncher\obj\Debug\PythonLauncher.pdb
-C:\svn\3ds-max-dev\sandbox\cdiggins\PythonLauncher\obj\PythonLauncher.dll
-C:\svn\3ds-max-dev\sandbox\cdiggins\PythonLauncher\obj\PythonLauncher.pdb
