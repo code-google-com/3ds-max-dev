@@ -1,4 +1,4 @@
-#summary Documentation for the unit testing framework maxtest
+#summary Documentation for the MAXScript unit testing framework maxtest
 #labels Featured
 #sidebar ProjectMaxtestTableOfContents
 
