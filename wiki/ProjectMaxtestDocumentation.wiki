@@ -1,5 +1,6 @@
 #summary Documentation for the unit testing framework maxtest
 #labels Featured
+#sidebar ProjectMaxtestTableOfContents
 
 = General Introduction =
 Lets start with a summary explaining the idea and purpose of maxtest. If you are familiar with unit testing you can skip this section.
@@ -12,6 +13,7 @@ It tries to achieve the former by using a class design allowing new structs to e
 The later means to run thousands of tests smoothly without crashing. Time will tell, where limits and problems will arise.
 
 
+*<br/>*
 = Design =
 The previous section explained the purpose of maxtest. In this part, we will explain the class design driving the framework.
 
@@ -24,6 +26,7 @@ The Presenter takes the Runner results and displays them back to the user.
 Currently one Finder exists, the so called DirCrawler. Also one Presenter exists the ListenerPresenter and one Runner called the same way.
 
 
+*<br/>*
 = Test Design =
 The former part explained to you how the interaction between the different framework components allow for testing. This section will show you how an actual test must be designed to be picked up and validated by the framework.
 
@@ -49,6 +52,7 @@ struct TestExample
 }}}
 
 
+*<br/>*
 = Assert2 =
 The Assert2 is a struct with static functions. The Assert2 doesn't need to be instanced. It can be viewed as a struct holding utility functions, important ones though. As the name suggests its purpose it to do an assert, e.g 1 equals 1.
 
@@ -84,12 +88,14 @@ Assert2.assertFalse (1 != 0)
 }}}
 
 
+*<br/>*
 = Advanced =
 == setUp and tearDown ==
 == DirCrawler ==
 == ListenerPresenter ==
 
 
+*<br/>*
 = Problems =
 == Assert2.raises in “on create do” ==
 If you raise an exception inside the constructor (on create do) of a struct, a popup opens, stopping further execution until “OK” is pressed. This is an odd behavior as it differs from the throw() behavior outside of the constructor.
@@ -102,6 +108,7 @@ Meanwhile a workaround can be used. Use a tool like “Click Off” to automatic
 Comparing two MAXScript arrays with each other doesn't work. The compare only tests the address of both arrays not their content. You have to manually assert the arrays content with each other.
 
 
+*<br/>*
 = Roadmap =
 == Implement profiling for tests ==
 Allow for logging run time of a check.
