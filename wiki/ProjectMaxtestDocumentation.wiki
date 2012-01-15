@@ -17,7 +17,7 @@ The later means to run thousands of tests smoothly without crashing. Time will t
 = Design =
 The previous section explained the purpose of maxtest. In this part, we will explain the class design driving the framework.
 
-[http://yuml.me/edit/74781a42 http://yuml.me/74781a42?nonsense=something_that_ends_with.png]
+[http://yuml.me/edit/57ed7245 http://yuml.me/57ed7245?nonsense=something_that_ends_with.png]
 
 Four base classes form the core of maxtest: Finder, Runner, Presenter, Assert2
 
