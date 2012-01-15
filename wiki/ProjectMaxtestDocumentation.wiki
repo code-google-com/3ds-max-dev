@@ -63,32 +63,33 @@ struct TestExample
 The Assert2 is a struct with static functions. The Assert2 doesn't need to be instanced. It can be viewed as a struct holding utility functions, important ones though. As the name suggests its purpose it to do an assert, e.g 1 equals 1.
 
 Currently six asserts are supported:
-* equals
+
+ * equals
 {{{
 Assert2.equals 1 1
 }}}
 
-* notEquals
+ * notEquals
 {{{
 Assert2.notEquals 1 0
 }}}
 
-* raises
+ * raises
 {{{
 Assert2.raises “*” testobj.testfunc args:#(1)
 }}}
 
-* notRaises
+ * notRaises
 {{{
 Assert2.notRaises testobj.testfunc args:#(1)
 }}}
 
-* assertTrue
+ * assertTrue
 {{{
 Assert2.assertTrue (isKindOf (Sphere()) Sphere)
 }}}
 
-* assertFalse
+ * assertFalse
 {{{
 Assert2.assertFalse (1 != 0)
 }}}
