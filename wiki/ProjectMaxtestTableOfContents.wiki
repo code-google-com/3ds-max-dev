@@ -6,6 +6,7 @@
   * [ProjectMaxtestDocumentation#Test_Design Test Design]
   * [ProjectMaxtestDocumentation#Assert2 Assert2]
   * [ProjectMaxtestDocumentation#Advanced Advanced]
+   * [ProjectMaxtestDocumentation#DirCrawler_struct DirCrawler struct]
   * [ProjectMaxtestDocumentation#Problems Problems]
   * [ProjectMaxtestDocumentation#Roadmap Roadmap]
   
