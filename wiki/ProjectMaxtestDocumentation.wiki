@@ -111,6 +111,9 @@ Assert2.assertFalse (1 != 0)
 *<br/>*
 = Advanced =
 == setUp and tearDown ==
+WIP
+
+*<br/>*
 == `DirCrawler` struct ==
 This section explains the `DirCrawler` struct, which is used to find tests. It implements the `Finder` interface.
 
@@ -162,8 +165,9 @@ fileIn @"finder.ms"
 )
 }}}
 
-== ListenerPresenter ==
-
+*<br/>*
+== `ListenerPresenter` struct ==
+WIP
 
 *<br/>*
 = Problems =
