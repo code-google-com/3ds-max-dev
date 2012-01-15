@@ -111,13 +111,56 @@ Assert2.assertFalse (1 != 0)
 *<br/>*
 = Advanced =
 == setUp and tearDown ==
-== DirCrawler ==
-This section explains the `DirCrawler` struct, which is used to find tests. It implements the Finder interface. By recursively crawling from a certain directory down the hierarchy, it gathers tests with certain criteria.
+== `DirCrawler` struct ==
+This section explains the `DirCrawler` struct, which is used to find tests. It implements the `Finder` interface.
+
+By recursively crawling from a certain directory down the hierarchy, it gathers tests matching certain criteria.
 
 Three properties decide if it will be picked up:
  1. The filename the test lives in
  1. The name of the struct the test lives in
  1. The name of the function the test lives in
+
+Example implementation for a fictional struct called Splitter.
+{{{
+fileIn @"finder.ms"
+
+(
+	local searchDir = "c:\\projects\\splitter\\"
+
+
+	/* e.g.
+	   file: test_splitter.ms
+	   struct: struct TestSplitter ()
+	   function: function test_doSplit = ()
+	*/
+	local finderStandard = DirCrawler searchDir
+
+
+	/* e.g.
+	   file: slowtest_splitter.ms
+	   struct: struct TestSplitter ()
+	   function: function test_heavyComputationSplit = ()
+	*/
+	local finderFilePattern = DirCrawler searchDir "*slowtest_*.ms"
+
+
+	/* e.g.
+	   file: integrationtest_splitter.ms
+	   struct: struct IntegrationtestSplitter ()
+	   function: function test_canBeSplit = ()
+	*/
+	local finderStructPrefix = DirCrawler searchDir "*integrationtest_*.ms" "Integrationtest"
+
+
+	/* e.g.
+	   file: test_splitter.ms
+	   struct: struct TestSplitter ()
+	   function: function tmptest_canBeSplit = ()
+	*/
+	local finderFunctionPrefix = DirCrawler searchDir "*test_*.ms" "Test" "tmptest_"
+)
+}}}
 
 == ListenerPresenter ==
 
