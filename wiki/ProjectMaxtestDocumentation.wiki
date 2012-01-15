@@ -31,6 +31,15 @@ The `Presenter` takes the `Runner` results and displays them back to the user.
 
 Currently one `Finder` exists, the so called `DirCrawler`. Also one `Presenter` exists, the `ListenerPresenter` and one `Runner` equally named.
 
+== Extension ==
+The aim of the above chosen design, should allow other developer to extend the framework. 
+
+New finders can be created. Finders which don't crawl a directory structure, but look up test locations in a database or XML file.
+
+Also new presenters are possible. As an example results could be displayed in a GUI or simply just stored in a file at a certain place.
+
+What ever your pipeline is comfortable with.  
+
 
 *<br/>*
 = Test Design =
