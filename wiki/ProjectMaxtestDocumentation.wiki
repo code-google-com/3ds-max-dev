@@ -190,6 +190,9 @@ Meanwhile a workaround can be used. Use a tool like “Click Off” to automatic
 == Assert2.equals #() #() ==
 Comparing two MAXScript arrays with each other doesn't work. The compare only tests the address of both arrays not their content. You have to manually assert the arrays content with each other.
 
+== Commenting out Suite/Test ==
+Commenting out a test or a whole suite doesn't exclude the it from being run. The finder still finds the suite/test, because currently it doesn't consider comments. Cause the finder finds the suite/test, the runner then still tries to execute it, which results in an exception, because on execution the commented out code is not interpreted and missing.
+
 
 *<br/>*
 = Roadmap =
