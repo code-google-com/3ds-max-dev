@@ -269,7 +269,7 @@ struct Assert2
 			
 			local fileLineInfo = Assert2._locateAssert exceptionStr
 			
-			local resultDescription = Assert2._formatResultDescription "Assert2.equals" message expr "isn't" True fileLineInfo
+			local resultDescription = Assert2._formatResultDescription "Assert2.assertTrue" message expr "isn't" True fileLineInfo
 			
 			throw (resultDescription)
 		)
@@ -300,7 +300,7 @@ struct Assert2
 			
 			local fileLineInfo = Assert2._locateAssert exceptionStr
 			
-			local resultDescription = Assert2._formatResultDescription "Assert2.equals" message expr "isn't" False fileLineInfo
+			local resultDescription = Assert2._formatResultDescription "Assert2.assertFalse" message expr "isn't" False fileLineInfo
 			
 			throw (resultDescription)
 		)
