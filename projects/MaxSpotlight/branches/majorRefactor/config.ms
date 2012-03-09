@@ -31,15 +31,16 @@
 		
 		private _configs = #(
 			_Config name:#defaultText 		type:String 		default:"MaxSpotlight*",
-			_Config name:#autoSelect 		type:BooleanClass 	default:"false",
-			_Config name:#clearListener 	type:BooleanClass 	default:"true",
-			_Config name:#showNames 		type:BooleanClass 	default:"true",
-			_Config name:#showCount 		type:BooleanClass 	default:"true",
-			_Config name:#showSelectCount 	type:BooleanClass 	default:"true",
-			_Config name:#lostFocusSelect 	type:BooleanClass 	default:"true",
-			_Config name:#silentOnDrop 		type:BooleanClass 	default:"true",
-			_Config name:#autoMarkAll 		type:BooleanClass 	default:"true",
-			_Config name:#largeToolbar 		type:BooleanClass 	default:"false"
+			_Config name:#autoSelect 		type:BooleanClass 	default:false,
+			_Config name:#clearListener 	type:BooleanClass 	default:true,
+			_Config name:#showNames 		type:BooleanClass 	default:true,
+			_Config name:#showCount 		type:BooleanClass 	default:true,
+			_Config name:#showSelectCount 	type:BooleanClass 	default:true,
+			_Config name:#lostFocusSelect 	type:BooleanClass 	default:true,
+			_Config name:#silentOnDrop 		type:BooleanClass 	default:true,
+			_Config name:#autoMarkAll 		type:BooleanClass 	default:true,
+			_Config name:#typingTimerInMs	type:Integer		default:300,
+			_Config name:#limitPrintedLines	type:Integer		default:100
 		),
 		
 		
@@ -68,7 +69,7 @@
 		private
 		function setConfigValue inKey inVal =
 		(
-			setINISetting _configPath _sectionName inKey inVal
+			setINISetting _configPath _sectionName inKey (inVal as String)
 			
 		),
 		

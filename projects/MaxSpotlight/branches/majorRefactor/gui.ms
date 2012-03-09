@@ -30,18 +30,37 @@
 		local _verbosity = true
 		local _focused = false
 		
+		local _timer = 0
+		
 		local _config
 		local _util
+		
 		
 		
 		-- UI
 		-----
 		DotNetControl dntSelectField "System.Windows.Forms.RichTextBox" pos:[2,7] width:93 height:20
 		Button btConfig "C" height:16 width:16 pos:[100,8]
+		Timer tTyping "Typing Timer" interval:0 active:false
 		
 		
 		-- Function
 		-----------
+		
+		-- private
+		function startTimer =
+		(
+			tTyping.interval = _config.get #typingTimerInMs
+			tTyping.active = true
+		)
+		
+		
+		-- private
+		function endTimer =
+		(
+			tTyping.active = false
+		)
+		
 		
 		-- private
 		function initSelectField =
@@ -99,6 +118,13 @@
 		
 		
 		-- private
+		function canSelect =
+		(
+			_forceSelect or _config.get #autoSelect
+		)
+		
+		
+		-- private
 		function doSelect txt =
 		(
 			if isValidText txt then (
@@ -134,34 +160,13 @@
 				nodeNames = for nodeOn in nodes collect nodeOn.name
 			)
 			
-			if canShowNames() then
-				_util.logResults nodeNames
+			if canShowNames() then (
+				local limitPrintedLines = _config.get #limitPrintedLines
+				_util.logResults nodeNames limitPrintedLines
+			)
 			
 			if canShowCount() then
 				_util.logFoundNumNodes nodeNames.count
-		)
-		
-		
-		-- public
-		function enter txt autoSelect:false silentMode:true =
-		(
-			/*
-				Enters txt in the TextBox. 
-			
-				@note: Triggers event "TextChanged" on dntSelectField.
-				
-				@keyword silentMode: controls overall verbosity (clearListener, names, counts, selectionsCounts)
-				@type silentMode: Bool
-			 */
-			
-			if autoSelect then
-				_forceSelect = true
-			if silentMode then
-				_verbosity = false
-			
-			dntSelectField.text = txt
-			
-			Ok
 		)
 		
 		
@@ -173,6 +178,29 @@
 			dntSelectField.Select index 0
 			
 			_focused = true
+		)
+		
+		
+		-- public
+		function enter txt overrideSelect:false silentMode:true =
+		(
+			/*
+				Enters txt in the TextBox. 
+				
+				@note: Triggers event "TextChanged" on dntSelectField.
+				
+				@keyword silentMode: controls overall verbosity (clearListener, names, counts, selectionsCounts)
+				@type silentMode: Bool
+			 */
+			
+			if overrideSelect then
+				_forceSelect = true
+			if silentMode then
+				_verbosity = false
+			
+			dntSelectField.text = txt
+			
+			Ok
 		)
 		
 		
@@ -203,39 +231,36 @@
 		)
 		
 		
-		on dntSelectField TextChanged sender args do 
+		on tTyping tick do
 		(
-			if not _config.isValid() then
-				_config.init()
-			
-			showResult dntSelectField.text
-			
-			if _forceSelect or _config.get #autoSelect then
-				doSelect dntSelectField.text
+			if _verbosity then
+				showResult dntSelectField.text
+			endTimer()
 		)
 		
 		
-		on dntSelectField Click sender args do
+		on dntSelectField TextChanged sender args do 
 		(
-			if not _focused then
-				setCursorAtClickPosition args.location
+			if not _config.isValid() then (
+				_config.init()
+				tTyping.interval = _config.get #typingTimerInMs
+			)
+			
+			if isValidText dntSelectField.text then
+				startTimer()
+			
+			if canSelect() then (
+				doSelect dntSelectField.text
+			)
 		)
 		
 		
 		on dntSelectField KeyUp sender args do
 		(
-			if args.KeyCode == _Keys.Enter then
+			if args.KeyCode == _Keys.Enter then (
 				doSelect dntSelectField.text
-		)
-		
-		
-		on dntSelectField LostFocus sender args do
-		(
-			if isValidText dntSelectField.text then (
-				if _config.get #lostFocusSelect then 
-					doSelect dntSelectField.text
-			) else
-				dntSelectField.text = _config.get #defaultText
+				endTimer()
+			)
 		)
 		
 		
@@ -245,7 +270,21 @@
 				_verbosity = false
 			
 			local txt = args.data.GetData (_DataFormats.text)
-			enter txt autoSelect:true silentMode:false
+			enter txt overrideSelect:true silentMode:false
+		)
+		
+		
+		on dntSelectField DragEnter sender args do
+		( 
+			if args.Data.GetDataPresent (_DataFormats.Text) then
+				args.Effect = _DragDropEffects.copy
+		)
+		
+		
+		on dntSelectField Click sender args do
+		(
+			if not _focused then
+				setCursorAtClickPosition args.location
 		)
 		
 		
@@ -261,10 +300,13 @@
 		)
 		
 		
-		on dntSelectField DragEnter sender args do
-		( 
-			if args.Data.GetDataPresent (_DataFormats.Text) then
-				args.Effect = _DragDropEffects.copy
+		on dntSelectField LostFocus sender args do
+		(
+			if isValidText dntSelectField.text then (
+				if _config.get #lostFocusSelect then 
+					doSelect dntSelectField.text
+			) else
+				dntSelectField.text = _config.get #defaultText
 		)
 	)
 	

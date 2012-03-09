@@ -65,12 +65,17 @@
 		
 		
 		public
-		function logResults nodeNames =
+		function logResults nodeNames limitPrintedLines =
 		(
 			local outStream = StringStream ""
 			
-			for nodeNameOn in nodeNames do
-				format "% %\n" _appLabel nodeNameOn to:outStream
+			for i=1 to nodeNames.count while i < limitPrintedLines do
+				format "% %\n" _appLabel nodeNames[i] to:outStream
+			
+			if nodeNames.count > limitPrintedLines then (
+				local pattern = "\n% ... (Line limit (%) reached, other nodes are ommitted)\n"
+				format pattern _appLabel limitPrintedLines to:outStream
+			)
 			
 			format "%" (outStream as String)
 		)
