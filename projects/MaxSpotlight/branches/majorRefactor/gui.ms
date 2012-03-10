@@ -11,12 +11,9 @@
 (
 	try(CUI.unRegisterDialogBar ::ro_MaxSpotlight) catch()
 	try(destroyDialog ::ro_MaxSpotlight) catch()
-
-	
-	local MaxSpotlightConfig = fileIn "config.ms"
-	local MaxSpotlightUtil = fileIn "util.ms"
 	
 	
+	global ro_MaxSpotlight
 	rollout ro_MaxSpotlight "MaxSpotlight"
 	(
 		-- Local
@@ -25,40 +22,176 @@
 		local _DataFormats = DotNetClass "System.Windows.Forms.DataFormats"
 		local _Keys = DotNetClass "System.Windows.Forms.Keys"
 		
-		local _forceClearListener = false -- when rollout gets initiated, it won't clear the listener
-		local _forceSelect = false
-		local _verbosity = true
-		local _focused = false
 		
+		-- won't clear the listener unless SelectField is initialized
+		local _initSelectFieldFinished = false 
+		local _dropped = false
 		local _timer = 0
+		
 		
 		local _config
 		local _util
 		
+		
+		local _MODE = (
+			struct _MODE
+			(
+				DragDrop 	= 1,
+				EnterKeyUp 	= 2,
+				LostFocus 	= 3,
+				TextChanged = 4
+			)
+			_MODE()
+		)
 		
 		
 		-- UI
 		-----
 		DotNetControl dntSelectField "System.Windows.Forms.RichTextBox" pos:[2,7] width:93 height:20
 		Button btConfig "C" height:16 width:16 pos:[100,8]
-		Timer tTyping "Typing Timer" interval:0 active:false
+		Timer tTypingTimer "Typing Timer" interval:0 active:false
 		
 		
 		-- Function
 		-----------
 		
-		-- private
-		function startTimer =
+		-- public
+		function createUI =
 		(
-			tTyping.interval = _config.get #typingTimerInMs
-			tTyping.active = true
+			createDialog ::ro_MaxSpotlight escapeEnable:false width:120 height:34
+			CUI.registerDialogBar ::ro_MaxSpotlight style:#(#cui_dock_horz, #cui_floatable, #cui_handles)
+			CUI.dockDialogBar ::ro_MaxSpotlight #cui_dock_top
 		)
 		
 		
 		-- private
-		function endTimer =
+		function startTimer =
 		(
-			tTyping.active = false
+			tTypingTimer.interval = _config.get #typingTimerInMs
+			tTypingTimer.active = true
+		)
+		
+		
+		-- private
+		function stopTimer =
+		(
+			tTypingTimer.active = false
+		)
+		
+		
+		-- private
+		function isValidText txt =
+		(
+			return txt != "" and not isSpace txt and txt != (_config.get #defaultText)
+		)
+		
+		
+		-- private
+		function canListenerBeCleared =
+		(
+			return (_config.get #clearListener) and _initSelectFieldFinished
+		)
+		
+		
+		-- private
+		function logNodesWhichMatch txt =
+		(
+			/*
+				Searches for all occurences of the TextBox text in object names and prints them out.
+			 */
+			
+			local nodes = _util.getExactNodesOrNodesMatchingPattern txt
+			local nodeNames = for nodeOn in nodes collect nodeOn.name
+			
+			if _config.get #showNames then
+				_util.logNodeNames nodeNames (_config.get #lineLimit)
+			
+			if _config.get #showCount then
+				_util.logFoundNumNodes nodeNames.count
+		)
+		
+		
+		-- private
+		function initConfig =
+		(
+			_config.init()
+			tTypingTimer.interval = _config.get #typingTimerInMs
+		)
+		
+		
+		-- private
+		function logAndOrSelect mode txt =
+		(
+			/*
+				@note: 	The different behavior sometimes vary so little, that it can be confusing.
+						I am keeping all behaviors together here for better overview.
+			 */
+			
+			if not _config.isValid() then
+				initConfig()
+			
+			case mode of (
+				(_MODE.DragDrop): (
+					if not isValidText txt then (
+						dntSelectField.text = _config.get #defaultText
+						dntSelectField.selectAll()
+						return Ok
+					)
+					
+					local nodes = _util.selectNodeByName txt
+					
+					if not _config.get #silentOnDrop and _config.get #showSelectCount then
+						_util.logSelectedNumNodes nodes.count
+					
+					dntSelectField.text = txt
+					
+					if _config.get #silentOnDrop then
+						_dropped = true
+					
+					stopTimer()
+				)
+				
+				(_MODE.EnterKeyUp): (
+					if not isValidText txt then (
+						dntSelectField.text = _config.get #defaultText
+						dntSelectField.selectAll()
+						return Ok
+					)
+					
+					local nodes = _util.selectNodeByName txt
+					
+					if _config.get #showSelectCount then
+						_util.logSelectedNumNodes nodes.count
+					
+					stopTimer()
+					dntSelectField.selectAll()
+				)
+				
+				(_MODE.LostFocus): (
+					if not isValidText txt then (
+						dntSelectField.text = _config.get #defaultText
+						return Ok
+					)
+					
+					if _config.get #lostFocusSelect then (
+						local nodes = _util.selectNodeByName txt
+						
+						if _config.get #showSelectCount then
+							_util.logSelectedNumNodes nodes.count
+						
+						stopTimer()
+					)
+				)
+				
+				(_MODE.TextChanged): (
+					if _initSelectFieldFinished and not _dropped and isValidText txt then
+						startTimer()
+					else
+						stopTimer()
+					
+					_dropped = false
+				)
+			)
 		)
 		
 		
@@ -78,138 +211,8 @@
 			dntSelectField.Text = _config.get #defaultText
 			
 			dntSelectField.Update()
-		)
-		
-		
-		-- private
-		function isValidText txt =
-		(
-			return txt != "" and not isSpace txt and txt != (_config.get #defaultText)
-		)
-		
-		
-		-- private
-		function canShowSelectedNumNodes =
-		(
-			return _config.get #showSelectCount and _verbosity
-		)
-		
-		
-		-- private
-		function canListenerBeCleared =
-		(
-			local listenerClear = _config.get #clearListener
-			return listenerClear and _forceClearListener and _verbosity
-		)
-		
-		
-		-- private
-		function canShowNames =
-		(
-			return _config.get #showNames and _verbosity
-		)
-		
-		
-		-- private
-		function canShowCount =
-		(
-			return _config.get #showCount and _verbosity
-		)
-		
-		
-		-- private
-		function canSelect =
-		(
-			_forceSelect or _config.get #autoSelect
-		)
-		
-		
-		-- private
-		function doSelect txt =
-		(
-			if isValidText txt then (
-				local nodes = _util.selectNodeByName txt
-				
-				if canShowSelectedNumNodes() then
-					_util.logSelectedNumNodes nodes.count
-			) else
-				dntSelectField.text = _config.get #defaultText
 			
-			-- Reset
-			_forceSelect = false
-			_verbosity 	= true
-		)
-		
-		
-		-- private
-		function showResult txt =
-		(
-			/*
-				Searches for all occurences of the TextBox text in object names and prints them out.
-			 */
-			
-			if canListenerBeCleared() then 
-				clearListener()
-			
-			_forceClearListener = true
-			
-			local nodeNames = #()
-			
-			if isValidText txt then (
-				local nodes = _util.getExactNodesOrNodesMatchingPattern txt
-				nodeNames = for nodeOn in nodes collect nodeOn.name
-			)
-			
-			if canShowNames() then (
-				local limitPrintedLines = _config.get #limitPrintedLines
-				_util.logResults nodeNames limitPrintedLines
-			)
-			
-			if canShowCount() then
-				_util.logFoundNumNodes nodeNames.count
-		)
-		
-		
-		-- private
-		function setCursorAtClickPosition pos =
-		(
-			local pt = DotNetObject "System.Drawing.Point" pos.x pos.y
-			local index = dntSelectField.GetCharIndexFromPosition pt
-			dntSelectField.Select index 0
-			
-			_focused = true
-		)
-		
-		
-		-- public
-		function enter txt overrideSelect:false silentMode:true =
-		(
-			/*
-				Enters txt in the TextBox. 
-				
-				@note: Triggers event "TextChanged" on dntSelectField.
-				
-				@keyword silentMode: controls overall verbosity (clearListener, names, counts, selectionsCounts)
-				@type silentMode: Bool
-			 */
-			
-			if overrideSelect then
-				_forceSelect = true
-			if silentMode then
-				_verbosity = false
-			
-			dntSelectField.text = txt
-			
-			Ok
-		)
-		
-		
-		-- public
-		function createUI =
-		(
-			createDialog ::ro_MaxSpotlight escapeEnable:false width:120 height:34
-			CUI.registerDialogBar ::ro_MaxSpotlight style:#(#cui_dock_horz, #cui_floatable, #cui_handles)
-			CUI.dockDialogBar ::ro_MaxSpotlight #cui_dock_top
+			_initSelectFieldFinished = true
 		)
 		
 		
@@ -224,67 +227,58 @@
 		
 		on ro_MaxSpotlight open do 
 		(
-			_config = MaxSpotlightConfig()
-			_util = MaxSpotlightUtil()
+			local Configurator = fileIn "config.ms"
+			local logAndOrSelectUtil = fileIn "util.ms"
+			
+			_config = Configurator()
+			_util = logAndOrSelectUtil()
 			
 			initSelectField()
 		)
 		
 		
-		on tTyping tick do
+		on tTypingTimer tick do
 		(
-			if _verbosity then
-				showResult dntSelectField.text
-			endTimer()
+			if canListenerBeCleared() then 
+				clearListener()
+			
+			logNodesWhichMatch dntSelectField.text
+			
+			if _config.get #autoSelect then (
+				local nodes = _util.selectNodeByName dntSelectField.text
+				
+				if _config.get #showSelectCount then
+					_util.logSelectedNumNodes nodes.count
+			)
+			
+			stopTimer()
 		)
 		
 		
+		-- SelectField Events
 		on dntSelectField TextChanged sender args do 
 		(
-			if not _config.isValid() then (
-				_config.init()
-				tTyping.interval = _config.get #typingTimerInMs
-			)
-			
-			if isValidText dntSelectField.text then
-				startTimer()
-			
-			if canSelect() then (
-				doSelect dntSelectField.text
-			)
+			logAndOrSelect _MODE.TextChanged dntSelectField.text
 		)
 		
 		
 		on dntSelectField KeyUp sender args do
 		(
-			if args.KeyCode == _Keys.Enter then (
-				doSelect dntSelectField.text
-				endTimer()
-			)
+			if args.KeyCode == _Keys.Enter then
+				logAndOrSelect _MODE.EnterKeyUp dntSelectField.text
+		)
+		
+		
+		on dntSelectField LostFocus sender args do
+		(
+			logAndOrSelect _MODE.LostFocus dntSelectField.text
 		)
 		
 		
 		on dntSelectField DragDrop sender args do 
 		( 
-			if _config.get #silentOnDrop then 
-				_verbosity = false
-			
 			local txt = args.data.GetData (_DataFormats.text)
-			enter txt overrideSelect:true silentMode:false
-		)
-		
-		
-		on dntSelectField DragEnter sender args do
-		( 
-			if args.Data.GetDataPresent (_DataFormats.Text) then
-				args.Effect = _DragDropEffects.copy
-		)
-		
-		
-		on dntSelectField Click sender args do
-		(
-			if not _focused then
-				setCursorAtClickPosition args.location
+			logAndOrSelect _MODE.DragDrop txt
 		)
 		
 		
@@ -293,20 +287,14 @@
 			if dntSelectField.text == _config.get #defaultText then
 				dntSelectField.text = ""
 			
-			dntSelectField.SelectAll()
-			
-			if not _config.get #autoMarkAll then
-				_focused = false -- invokes 'if-clause' in event "Click"
+			dntSelectField.selectAll()
 		)
 		
 		
-		on dntSelectField LostFocus sender args do
-		(
-			if isValidText dntSelectField.text then (
-				if _config.get #lostFocusSelect then 
-					doSelect dntSelectField.text
-			) else
-				dntSelectField.text = _config.get #defaultText
+		on dntSelectField DragEnter sender args do
+		( 
+			if args.Data.GetDataPresent (_DataFormats.Text) then
+				args.Effect = _DragDropEffects.copy
 		)
 	)
 	

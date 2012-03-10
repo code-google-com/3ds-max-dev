@@ -9,7 +9,7 @@
  */
 
 (
-	struct MaxSpotlightConfig
+	struct Configurator
 	(
 		private _configPath = @"",
 		private _configFilename = @"MaxSpotlight.ini",
@@ -38,9 +38,8 @@
 			_Config name:#showSelectCount 	type:BooleanClass 	default:true,
 			_Config name:#lostFocusSelect 	type:BooleanClass 	default:true,
 			_Config name:#silentOnDrop 		type:BooleanClass 	default:true,
-			_Config name:#autoMarkAll 		type:BooleanClass 	default:true,
 			_Config name:#typingTimerInMs	type:Integer		default:300,
-			_Config name:#limitPrintedLines	type:Integer		default:100
+			_Config name:#lineLimit			type:Integer		default:100
 		),
 		
 		

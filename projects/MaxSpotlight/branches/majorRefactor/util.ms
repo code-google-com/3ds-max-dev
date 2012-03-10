@@ -9,7 +9,7 @@
  */
 
 (
-	struct MaxSpotlightUtil
+	struct LogAndSelectUtil
 	(
 		private _appLabel = "<MaxSpotlight>",
 		
@@ -46,7 +46,7 @@
 		private
 		function logNumNodes mode numNodes =
 		(
-			format "\n% %: % node(s)\n" _appLabel mode numNodes
+			format "% %: % node(s)\n" _appLabel mode numNodes
 		),
 		
 		
@@ -60,24 +60,39 @@
 		public
 		function logFoundNumNodes numNodes =
 		(
+			
 			logNumNodes "Found" numNodes
 		),
 		
 		
-		public
-		function logResults nodeNames limitPrintedLines =
+		private
+		function isLineLimitActive lineLimit = 
 		(
-			local outStream = StringStream ""
+			lineLimit > 0
+		),
+		
+		
+		private
+		function addLineLimitLog stream lineLimit =
+		(
+			local pattern = "\n% ... (Reached line limit(%). Other nodes are ommitted.)\n"
+			format pattern _appLabel lineLimit to:stream
+		),
+		
+		
+		public
+		function logNodeNames nodeNames lineLimit =
+		(
+			local logStream = StringStream ""
 			
-			for i=1 to nodeNames.count while i < limitPrintedLines do
-				format "% %\n" _appLabel nodeNames[i] to:outStream
+			for i=1 to nodeNames.count while not isLineLimitActive lineLimit or i <= lineLimit do
+				format "% %\n" _appLabel nodeNames[i] to:logStream
 			
-			if nodeNames.count > limitPrintedLines then (
-				local pattern = "\n% ... (Line limit (%) reached, other nodes are ommitted)\n"
-				format pattern _appLabel limitPrintedLines to:outStream
-			)
+			if isLineLimitActive lineLimit and nodeNames.count > lineLimit then 
+				addLineLimitLog logStream lineLimit
 			
-			format "%" (outStream as String)
+			if nodeNames.count > 0 then
+				format "%\n" (logStream as String)
 		)
 	)
 )
