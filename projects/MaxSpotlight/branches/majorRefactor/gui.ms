@@ -24,8 +24,11 @@
 		
 		
 		-- won't clear the listener unless SelectField is initialized
-		local _initSelectFieldFinished = false 
+		local _initSelectFieldFinished = false
+		
+		-- DragDrop Event needs this to tell TextChanged not to start the timer
 		local _dropped = false
+		
 		local _timer = 0
 		
 		
@@ -120,6 +123,14 @@
 		
 		
 		-- private
+		function resetToSelectedDefaultText =
+		(
+			dntSelectField.text = _config.get #defaultText
+			dntSelectField.selectAll()
+		)
+		
+		
+		-- private
 		function logAndOrSelect mode txt =
 		(
 			/*
@@ -133,8 +144,7 @@
 			case mode of (
 				(_MODE.DragDrop): (
 					if not isValidText txt then (
-						dntSelectField.text = _config.get #defaultText
-						dntSelectField.selectAll()
+						resetToSelectedDefaultText()
 						return Ok
 					)
 					
@@ -153,8 +163,7 @@
 				
 				(_MODE.EnterKeyUp): (
 					if not isValidText txt then (
-						dntSelectField.text = _config.get #defaultText
-						dntSelectField.selectAll()
+						resetToSelectedDefaultText
 						return Ok
 					)
 					
