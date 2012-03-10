@@ -9,10 +9,11 @@
  */
 
 (
-	try(CUI.unRegisterDialogBar ::ro_MaxSpotlight) catch()
-	try(destroyDialog ::ro_MaxSpotlight) catch()
+	try(::maxSpotlight.destroy()) catch()
 	
-	global ro_MaxSpotlight = fileIn @"gui.ms"
+	local GUIWrapper = fileIn @"gui.ms"
+	global maxSpotlight = GUIWrapper()
 	
-	::ro_MaxSpotlight.createUI()
+	::maxSpotlight.setConfigDir @"K:\"
+	::maxSpotlight.create()
 )

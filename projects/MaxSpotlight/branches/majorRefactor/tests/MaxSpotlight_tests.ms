@@ -12,16 +12,20 @@ fileIn (maxtestDir + @"presenter.ms")
 	
 	-- gather different finders
 	local finders = #()
-	append finders (DirCrawler currentScriptDir "*test_g*.ms")
+ 	append finders (DirCrawler currentScriptDir "*test_*.ms")
+	append finders (DirCrawler currentScriptDir "*integrationtest_*.ms" "Integrationtest")
 
+	
 	-- run all finders
 	local tests = #()
 	for finderOn in finders do tests += finderOn.getTests()
 
+	
 	-- execute runner
 	local testRunner = Runner tests
 	local results = testRunner.getResults()	
-
+	
+	
 	-- display results
 	local presenter = PresenterListener results
 	presenter.show()

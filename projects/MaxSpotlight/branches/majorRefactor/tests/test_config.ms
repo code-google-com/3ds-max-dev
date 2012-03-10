@@ -35,6 +35,14 @@
 		(
 			local defaultText = configInst.get #defaultText
 			Assert2.equals defaultText defaultText
+		),
+		
+		
+		public
+		function assertLineLimit configInst default:100 =
+		(
+			local lineLimit = configInst.get #lineLimit
+			Assert2.equals lineLimit default
 		)
 	)
 	
@@ -146,9 +154,23 @@
 			
 			assertHelper.assertDefaultText _config
 			
-			_config.init
+			_config.init()
 			
 			assertHelper.assertDefaultText _config defaultText:"newDefaultText"
+		),
+		
+		
+		function test_init_invalidSetting =
+		(
+			assertHelper.assertLineLimit _config
+			
+			local configPath = assertHelper.getConfigPath()
+			setINISetting configPath "Settings" "lineLimit" "notANumber"
+			
+			assertHelper.assertLineLimit _config
+			
+			local val = getINISetting configPath "Settings" "lineLimit"
+			Assert2.equals val "notANumber"
 		)
 	)
 )

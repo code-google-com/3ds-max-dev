@@ -9,13 +9,14 @@
  */
 
 (
+	local Configurator
 	struct Configurator
 	(
 		/*
 			Struct for loading and storing the settings.
 		 */
 		
-		public inConfigDir = (getDir #userScripts),
+		public inConfigDir,
 		
 		private _configDir,		
 		private _configFilename = @"MaxSpotlight.ini",
@@ -24,8 +25,8 @@
 		
 		private _valid = true,
 		
-		private _Config = (
-			struct _Config
+		private _Setting = (
+			struct _Setting
 			(
 				name,
 				type,
@@ -35,17 +36,17 @@
 		),
 		
 		
-		private _configs = #(
-			_Config name:#defaultText 		type:String 		default:"MaxSpotlight*",
-			_Config name:#autoSelect 		type:BooleanClass 	default:false,
-			_Config name:#clearListener 	type:BooleanClass 	default:true,
-			_Config name:#showNames 		type:BooleanClass 	default:true,
-			_Config name:#showCount 		type:BooleanClass 	default:true,
-			_Config name:#showSelectCount 	type:BooleanClass 	default:true,
-			_Config name:#lostFocusSelect 	type:BooleanClass 	default:true,
-			_Config name:#silentOnDrop 		type:BooleanClass 	default:true,
-			_Config name:#typingTimerInMs	type:Integer		default:300,
-			_Config name:#lineLimit			type:Integer		default:100
+		private _settings = #(
+			_Setting name:#defaultText 		type:String 		default:"MaxSpotlight*",
+			_Setting name:#autoSelect 		type:BooleanClass 	default:false,
+			_Setting name:#clearListener 	type:BooleanClass 	default:true,
+			_Setting name:#showNames 		type:BooleanClass 	default:true,
+			_Setting name:#showCount 		type:BooleanClass 	default:true,
+			_Setting name:#showSelectCount 	type:BooleanClass 	default:true,
+			_Setting name:#lostFocusSelect 	type:BooleanClass 	default:true,
+			_Setting name:#silentOnDrop 	type:BooleanClass 	default:true,
+			_Setting name:#typingTimerInMs	type:Integer		default:300,
+			_Setting name:#lineLimit		type:Integer		default:100
 		),
 		
 		
@@ -92,20 +93,39 @@
 		),
 		
 		
+		private
+		function castValue val config =
+		(
+			local castedVal
+			try (castedVal = val as (config.type)) catch ()
+			
+			if castedVal == undefined then (
+				castedVal = config.default
+				
+				local pattern = "<MaxSpotlight> Setting '%' with value '%' couldn't be cast to %. " +
+					"Using default: %. Check your setting file.\n"
+				format pattern (config.name as String) val config.type config.default
+			)
+			
+			return castedVal
+		),
+		
+		
 		public
 		function init =
 		(
 			_configPath = getConfigPath()
 			
-			for configOn in _configs do (
-				local val = getConfigFromINI configOn.name
+			for settingOn in _settings do (
+				local val = getConfigFromINI settingOn.name
 				
 				if not isSet val then (
-					val = configOn.default
-					setConfigValue configOn.name val
+					val = settingOn.default
+					setConfigValue settingOn.name val
 				)
 				
-				configOn.val = val as (configOn.type)
+				local castedVal = castValue val settingOn				
+				settingOn.val = castedVal
 			)
 			
 			_valid = true
@@ -113,15 +133,15 @@
 		
 		
 		public
-		function get configName =
+		function get settingName =
 		(
-			local config = undefined
-			for configOn in _configs while config == undefined where configOn.name == configName do config = configOn
+			local setting = undefined
+			for settingOn in _settings while setting == undefined where settingOn.name == settingName do setting = settingOn
 			
-			if config == undefined then
-				throw "Config doesn't exist: " configName
+			if setting == undefined then
+				throw "Setting doesn't exist: " settingName
 			
-			return config.val
+			return setting.val
 		),
 		
 		

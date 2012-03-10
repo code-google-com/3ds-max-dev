@@ -9,6 +9,7 @@
  */
 
 (
+	local SelectAndLogUtil
 	struct SelectAndLogUtil
 	(
 		/*
