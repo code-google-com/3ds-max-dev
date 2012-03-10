@@ -9,11 +9,6 @@
  */
 
 (
-	try(CUI.unRegisterDialogBar ::ro_MaxSpotlight) catch()
-	try(destroyDialog ::ro_MaxSpotlight) catch()
-	
-	
-	global ro_MaxSpotlight
 	rollout ro_MaxSpotlight "MaxSpotlight"
 	(
 		/*
@@ -53,9 +48,9 @@
 		-- public
 		function createUI =
 		(
-			createDialog ::ro_MaxSpotlight escapeEnable:false width:120 height:34
-			CUI.registerDialogBar ::ro_MaxSpotlight style:#(#cui_dock_horz, #cui_floatable, #cui_handles)
-			CUI.dockDialogBar ::ro_MaxSpotlight #cui_dock_top
+			createDialog ro_MaxSpotlight escapeEnable:false width:120 height:34
+			CUI.registerDialogBar ro_MaxSpotlight style:#(#cui_dock_horz, #cui_floatable, #cui_handles)
+			CUI.dockDialogBar ro_MaxSpotlight #cui_dock_top
 		)
 		
 		
@@ -98,11 +93,7 @@
 		-- private
 		function logNodesWhichMatch txt =
 		(
-			/*
-				Searches for all occurences of the TextBox text in object names and prints them out.
-			 */
-			
-			local nodeNames = _util.getAllNodeNamesWithExactOrPatternMatch txt
+			local nodeNames = _util.getNodeNamesWithExactOrPatternMatch txt
 			
 			if _config.get #showNames then
 				_util.logNodeNames nodeNames (_config.get #lineLimit)
@@ -183,7 +174,6 @@
 		
 		on btConfig pressed do
 		(
-			_config.invalidateConfig()
 			_config.showConfig()
 		)
 		
@@ -281,7 +271,4 @@
 				args.Effect = _DragDropEffects.copy
 		)
 	)
-	
-	
-	::ro_MaxSpotlight.createUI()
 )

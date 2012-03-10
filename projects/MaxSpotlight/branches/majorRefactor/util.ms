@@ -72,7 +72,7 @@
 		
 		
 		private
-		function getAllNodesWithExactOrPatternMatch txt =
+		function getNodesWithExactOrPatternMatch txt =
 		(
 			local exactHits = getNodeByName txt all:true
 			
@@ -86,9 +86,9 @@
 		
 		
 		public
-		function getAllNodeNamesWithExactOrPatternMatch txt =
+		function getNodeNamesWithExactOrPatternMatch txt =
 		(
-			local nodes = getAllNodesWithExactOrPatternMatch txt
+			local nodes = getNodesWithExactOrPatternMatch txt
 			return for nodeOn in nodes collect nodeOn.name
 		),
 		
@@ -102,7 +102,7 @@
 				If no exact match, it selects all objects which includes the text.
 			 */			
 			
-			local nodes = getAllNodesWithExactOrPatternMatch txt
+			local nodes = getNodesWithExactOrPatternMatch txt
 			select nodes
 			return nodes
 		),

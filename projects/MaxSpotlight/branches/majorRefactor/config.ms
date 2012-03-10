@@ -15,7 +15,9 @@
 			Struct for loading and storing the settings.
 		 */
 		
-		private _configDir = getDir #userScripts,		
+		public inConfigDir = (getDir #userScripts),
+		
+		private _configDir,		
 		private _configFilename = @"MaxSpotlight.ini",
 		private _configPath = @"",
 		private _sectionName = "Settings",
@@ -48,9 +50,9 @@
 		
 		
 		public
-		function setConfigDir inDir =
+		function isValid =
 		(
-			_configDir = inDir
+			return _valid
 		),
 		
 		
@@ -58,13 +60,6 @@
 		function invalidateConfig =
 		(
 			_valid = false
-		),
-		
-		
-		public
-		function isValid =
-		(
-			return _valid
 		),
 		
 		
@@ -134,11 +129,16 @@
 		function showConfig =
 		(
 			edit _configPath
+			invalidateConfig()
 		),
 		
 		
 		on create do
 		(
+			if not (DotNetClass "System.IO.Directory").Exists (inConfigDir as String) then
+				throw "Exception on construction. Directory doesn't exist: " inConfigDir
+			
+			_configDir = inConfigDir
 			init()
 		)
 	)
