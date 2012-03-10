@@ -1,23 +1,19 @@
 (
 	local currentScriptDir = getFilenamePath (getSourceFileName())
 	local SelectAndLogUtil = fileIn (currentScriptDir + @"..\util.ms")
+	
+	
+	local TestHelper = fileIn @"testhelper.ms"
+	local testHelper = TestHelper()
 
 	
 	local AssertHelper
 	struct AssertHelper
 	(
-		private
-		function getListenerText =
-		(
-			setListenerSel #(0,-1)
-			getListenerSelText()
-		),
-		
-		
 		public
 		function assertListenerText expectedText =
 		(
-			local listenerText = getListenerText()
+			local listenerText = testHelper.getListenerText()
 			Assert2.equals listenerText expectedText
 		),
 		

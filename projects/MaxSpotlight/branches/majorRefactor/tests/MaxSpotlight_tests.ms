@@ -12,7 +12,7 @@ fileIn (maxtestDir + @"presenter.ms")
 	
 	-- gather different finders
 	local finders = #()
- 	append finders (DirCrawler currentScriptDir "*test_*.ms")
+	append finders (DirCrawler currentScriptDir "*test_*.ms")
 	append finders (DirCrawler currentScriptDir "*integrationtest_*.ms" "Integrationtest")
 
 	

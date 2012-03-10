@@ -3,29 +3,17 @@
 	local Configurator = fileIn (CURRENT_SCRIPT_DIR + @"..\config.ms")
 	
 	
+	local TestHelper = fileIn @"testhelper.ms"
+	local testHelper = TestHelper()
+	
+	
 	local AssertHelper
 	struct AssertHelper
 	(
 		public
-		function getConfigPath =
-		(
-			return PathConfig.appendPath CURRENT_SCRIPT_DIR @"MaxSpotlight.ini"
-		),
-		
-		
-		public
-		function removeConfigIfExists =
-		(
-			local configPath = getConfigPath()
-			if doesFileExist configPath then
-				deleteFile configPath
-		),
-		
-		
-		public
 		function assertConfigPath =
 		(
-			local configPath = getConfigPath()
+			local configPath = testHelper.getConfigPath()
 			Assert2.assertTrue (doesFileExist configPath)
 		),
 		
@@ -54,7 +42,7 @@
 	(
 		function tearDown =
 		(
-			assertHelper.removeConfigIfExists()
+			testHelper.removeConfigIfExists()
 		),
 		
 		
@@ -93,7 +81,7 @@
 		
 		function tearDown =
 		(
-			assertHelper.removeConfigIfExists()
+			testHelper.removeConfigIfExists()
 		),
 		
 		
@@ -149,7 +137,7 @@
 		(
 			assertHelper.assertDefaultText _config
 			
-			local configPath = assertHelper.getConfigPath()
+			local configPath = testHelper.getConfigPath()
 			setINISetting configPath "Settings" "defaultText" "newDefaultText"
 			
 			assertHelper.assertDefaultText _config
@@ -164,7 +152,7 @@
 		(
 			assertHelper.assertLineLimit _config
 			
-			local configPath = assertHelper.getConfigPath()
+			local configPath = testHelper.getConfigPath()
 			setINISetting configPath "Settings" "lineLimit" "notANumber"
 			
 			assertHelper.assertLineLimit _config
