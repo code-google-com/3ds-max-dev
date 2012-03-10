@@ -9,38 +9,44 @@
  */
 
 (
-	struct LogAndSelectUtil
+	struct SelectAndLogUtil
 	(
+		/*
+			Struct for performing node selection and logging based on string patterns.
+		 */
+		
 		private _appLabel = "<MaxSpotlight>",
 		
 		
-		public
-		function getExactNodesOrNodesMatchingPattern txt =
+		private
+		function isLineLimitActive lineLimit = 
 		(
-			local exactHits = getNodeByName txt all:true
-			
-			if exactHits.count > 0 then
-				return exactHits
-			else (
-				local pattern = "*" + txt + "*"
-				return for nodeOn in objects where matchPattern nodeOn.name pattern:pattern collect nodeOn			
-			)
-		),		
+			return lineLimit > 0
+		),
+		
+		
+		private
+		function addLineLimitLog stream lineLimit =
+		(
+			local pattern = "\n% ... (Reached line limit(%). Other nodes are ommitted.)\n"
+			format pattern _appLabel lineLimit to:stream
+		),
 		
 		
 		public
-		function selectNodeByName txt =
+		function logNodeNames nodeNames lineLimit =
 		(
-			/*
-				Checks if a node with the exact txt is in scene and selects it.
-				It does this even if other nodes include that text but also more.
-				If no exact match, it selects all objects which includes the text.
-			 */			
+			local logStream = StringStream ""
 			
-			local nodes = getExactNodesOrNodesMatchingPattern txt
-			select nodes
-			return nodes
-		),		
+			for i=1 to nodeNames.count while not isLineLimitActive lineLimit or i <= lineLimit do
+				format "% %\n" _appLabel nodeNames[i] to:logStream
+			
+			if isLineLimitActive lineLimit and nodeNames.count > lineLimit then 
+				addLineLimitLog logStream lineLimit
+			
+			if nodeNames.count > 0 then
+				format "%\n" (logStream as String)
+		),
 		
 		
 		private
@@ -66,33 +72,47 @@
 		
 		
 		private
-		function isLineLimitActive lineLimit = 
+		function getAllNodesWithExactOrPatternMatch txt =
 		(
-			lineLimit > 0
-		),
-		
-		
-		private
-		function addLineLimitLog stream lineLimit =
-		(
-			local pattern = "\n% ... (Reached line limit(%). Other nodes are ommitted.)\n"
-			format pattern _appLabel lineLimit to:stream
+			local exactHits = getNodeByName txt all:true
+			
+			if exactHits.count > 0 then
+				return exactHits
+			else (
+				local pattern = "*" + txt + "*"
+				return for nodeOn in objects where matchPattern nodeOn.name pattern:pattern collect nodeOn			
+			)
 		),
 		
 		
 		public
-		function logNodeNames nodeNames lineLimit =
+		function getAllNodeNamesWithExactOrPatternMatch txt =
 		(
-			local logStream = StringStream ""
+			local nodes = getAllNodesWithExactOrPatternMatch txt
+			return for nodeOn in nodes collect nodeOn.name
+		),
+		
+		
+		public
+		function selectNodes txt =
+		(
+			/*
+				Checks if a node with the exact txt is in scene and selects it.
+				It does this even if other nodes include that text but also more.
+				If no exact match, it selects all objects which includes the text.
+			 */			
 			
-			for i=1 to nodeNames.count while not isLineLimitActive lineLimit or i <= lineLimit do
-				format "% %\n" _appLabel nodeNames[i] to:logStream
-			
-			if isLineLimitActive lineLimit and nodeNames.count > lineLimit then 
-				addLineLimitLog logStream lineLimit
-			
-			if nodeNames.count > 0 then
-				format "%\n" (logStream as String)
+			local nodes = getAllNodesWithExactOrPatternMatch txt
+			select nodes
+			return nodes
+		),
+		
+		
+		public
+		function selectNodesAndLog txt =
+		(
+			local nodes = selectNodes txt
+			logSelectedNumNodes nodes.count
 		)
 	)
 )

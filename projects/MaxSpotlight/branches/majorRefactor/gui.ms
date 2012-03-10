@@ -16,6 +16,11 @@
 	global ro_MaxSpotlight
 	rollout ro_MaxSpotlight "MaxSpotlight"
 	(
+		/*
+			The input text field for querying nodes in the current scene.
+		 */
+		
+		
 		-- Local
 		--------
 		local _DragDropEffects = DotNetClass "System.Windows.Forms.DragDropEffects"
@@ -25,27 +30,14 @@
 		
 		-- won't clear the listener unless SelectField is initialized
 		local _initSelectFieldFinished = false
-		
 		-- DragDrop Event needs this to tell TextChanged not to start the timer
-		local _dropped = false
+		local _dragDropTriggered = false
 		
 		local _timer = 0
 		
 		
 		local _config
 		local _util
-		
-		
-		local _MODE = (
-			struct _MODE
-			(
-				DragDrop 	= 1,
-				EnterKeyUp 	= 2,
-				LostFocus 	= 3,
-				TextChanged = 4
-			)
-			_MODE()
-		)
 		
 		
 		-- UI
@@ -68,6 +60,20 @@
 		
 		
 		-- private
+		function isValidText txt =
+		(
+			return txt != "" and not isSpace txt and txt != (_config.get #defaultText)
+		)
+		
+		
+		-- private
+		function canTimerStart =
+		(
+			return _initSelectFieldFinished and not _dragDropTriggered and isValidText dntSelectField.text
+		)
+		
+		
+		-- private
 		function startTimer =
 		(
 			tTypingTimer.interval = _config.get #typingTimerInMs
@@ -79,13 +85,6 @@
 		function stopTimer =
 		(
 			tTypingTimer.active = false
-		)
-		
-		
-		-- private
-		function isValidText txt =
-		(
-			return txt != "" and not isSpace txt and txt != (_config.get #defaultText)
 		)
 		
 		
@@ -103,22 +102,13 @@
 				Searches for all occurences of the TextBox text in object names and prints them out.
 			 */
 			
-			local nodes = _util.getExactNodesOrNodesMatchingPattern txt
-			local nodeNames = for nodeOn in nodes collect nodeOn.name
+			local nodeNames = _util.getAllNodeNamesWithExactOrPatternMatch txt
 			
 			if _config.get #showNames then
 				_util.logNodeNames nodeNames (_config.get #lineLimit)
 			
 			if _config.get #showCount then
 				_util.logFoundNumNodes nodeNames.count
-		)
-		
-		
-		-- private
-		function initConfig =
-		(
-			_config.init()
-			tTypingTimer.interval = _config.get #typingTimerInMs
 		)
 		
 		
@@ -131,75 +121,21 @@
 		
 		
 		-- private
-		function logAndOrSelect mode txt =
+		function selectAndOptionalLog txt withLog =
 		(
-			/*
-				@note: 	The different behavior sometimes vary so little, that it can be confusing.
-						I am keeping all behaviors together here for better overview.
-			 */
-			
-			if not _config.isValid() then
-				initConfig()
-			
-			case mode of (
-				(_MODE.DragDrop): (
-					if not isValidText txt then (
-						resetToSelectedDefaultText()
-						return Ok
-					)
-					
-					local nodes = _util.selectNodeByName txt
-					
-					if not _config.get #silentOnDrop and _config.get #showSelectCount then
-						_util.logSelectedNumNodes nodes.count
-					
-					dntSelectField.text = txt
-					
-					if _config.get #silentOnDrop then
-						_dropped = true
-					
-					stopTimer()
-				)
-				
-				(_MODE.EnterKeyUp): (
-					if not isValidText txt then (
-						resetToSelectedDefaultText
-						return Ok
-					)
-					
-					local nodes = _util.selectNodeByName txt
-					
-					if _config.get #showSelectCount then
-						_util.logSelectedNumNodes nodes.count
-					
-					stopTimer()
-					dntSelectField.selectAll()
-				)
-				
-				(_MODE.LostFocus): (
-					if not isValidText txt then (
-						dntSelectField.text = _config.get #defaultText
-						return Ok
-					)
-					
-					if _config.get #lostFocusSelect then (
-						local nodes = _util.selectNodeByName txt
-						
-						if _config.get #showSelectCount then
-							_util.logSelectedNumNodes nodes.count
-						
-						stopTimer()
-					)
-				)
-				
-				(_MODE.TextChanged): (
-					if _initSelectFieldFinished and not _dropped and isValidText txt then
-						startTimer()
-					else
-						stopTimer()
-					
-					_dropped = false
-				)
+			if withLog then
+				_util.selectNodesAndLog txt
+			else
+				_util.selectNodes txt
+		)
+		
+		
+		-- private
+		function loadConfigIfInvalid =
+		(
+			if not _config.isValid() then (
+				_config.init()
+				tTypingTimer.interval = _config.get #typingTimerInMs
 			)
 		)
 		
@@ -225,24 +161,30 @@
 		)
 		
 		
+		-- private
+		function initConfigAndUtil =
+		(
+			local Configurator = fileIn "config.ms"
+			_config = Configurator()
+			
+			local SelectAndLogUtil = fileIn "util.ms"
+			_util = SelectAndLogUtil()
+		)
+		
+		
 		-- Event
 		--------
+		on ro_MaxSpotlight open do 
+		(
+			initConfigAndUtil()
+			initSelectField()
+		)
+		
+		
 		on btConfig pressed do
 		(
 			_config.invalidateConfig()
 			_config.showConfig()
-		)
-		
-		
-		on ro_MaxSpotlight open do 
-		(
-			local Configurator = fileIn "config.ms"
-			local logAndOrSelectUtil = fileIn "util.ms"
-			
-			_config = Configurator()
-			_util = logAndOrSelectUtil()
-			
-			initSelectField()
 		)
 		
 		
@@ -253,41 +195,74 @@
 			
 			logNodesWhichMatch dntSelectField.text
 			
-			if _config.get #autoSelect then (
-				local nodes = _util.selectNodeByName dntSelectField.text
-				
-				if _config.get #showSelectCount then
-					_util.logSelectedNumNodes nodes.count
-			)
+			if _config.get #autoSelect then
+				selectAndOptionalLog dntSelectField.text (_config.get #showSelectCount)
 			
 			stopTimer()
 		)
 		
 		
 		-- SelectField Events
-		on dntSelectField TextChanged sender args do 
-		(
-			logAndOrSelect _MODE.TextChanged dntSelectField.text
+		on dntSelectField DragDrop sender args do 
+		( 
+			loadConfigIfInvalid()
+			
+			local txt = args.data.GetData (_DataFormats.text)
+			if isValidText txt then (
+				local withLogFlag = not _config.get #silentOnDrop and _config.get #showSelectCount
+				selectAndOptionalLog dntSelectField.text withLogFlag
+				
+				if _config.get #silentOnDrop then
+					_dragDropTriggered = true
+				
+				-- Triggers Even TextChanged
+				dntSelectField.text = txt
+				
+				stopTimer()
+			) else
+				resetToSelectedDefaultText()
 		)
 		
 		
 		on dntSelectField KeyUp sender args do
 		(
-			if args.KeyCode == _Keys.Enter then
-				logAndOrSelect _MODE.EnterKeyUp dntSelectField.text
+			if args.KeyCode == _Keys.Enter then (
+				loadConfigIfInvalid()
+				
+				if isValidText dntSelectField.text then (
+					selectAndOptionalLog dntSelectField.text (_config.get #showSelectCount)
+					dntSelectField.selectAll()
+					stopTimer()
+				) else
+					resetToSelectedDefaultText()
+			)
 		)
 		
 		
 		on dntSelectField LostFocus sender args do
 		(
-			logAndOrSelect _MODE.LostFocus dntSelectField.text
+			loadConfigIfInvalid()
+			
+			if isValidText dntSelectField.text then (
+				if _config.get #lostFocusSelect then
+					selectAndOptionalLog dntSelectField.text (_config.get #showSelectCount)
+				
+				stopTimer()
+			) else
+				dntSelectField.text = _config.get #defaultText
 		)
 		
 		
-		on dntSelectField DragDrop sender args do 
-		( 
-			local txt = args.data.GetData (_DataFormats.text)
-			logAndOrSelect _MODE.DragDrop txt
+		on dntSelectField TextChanged sender args do 
+		(
+			loadConfigIfInvalid()
+			
+			if canTimerStart() then
+				startTimer()
+			else
+				stopTimer()
+			
+			_dragDropTriggered = false
 		)
 		
 		

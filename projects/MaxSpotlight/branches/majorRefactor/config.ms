@@ -11,12 +11,16 @@
 (
 	struct Configurator
 	(
-		private _configPath = @"",
+		/*
+			Struct for loading and storing the settings.
+		 */
+		
+		private _configDir = getDir #userScripts,		
 		private _configFilename = @"MaxSpotlight.ini",
+		private _configPath = @"",
 		private _sectionName = "Settings",
 		
 		private _valid = true,
-		
 		
 		private _Config = (
 			struct _Config
@@ -44,6 +48,13 @@
 		
 		
 		public
+		function setConfigDir inDir =
+		(
+			_configDir = inDir
+		),
+		
+		
+		public
 		function invalidateConfig =
 		(
 			_valid = false
@@ -60,8 +71,7 @@
 		private
 		function getConfigPath =
 		(
-			local userScripts = getDir #userScripts
-			return PathConfig.appendPath userScripts _configFilename
+			return PathConfig.appendPath _configDir _configFilename
 		),
 		
 		
