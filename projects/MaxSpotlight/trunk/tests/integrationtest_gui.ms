@@ -84,39 +84,39 @@
 		
 		function test_GotFocus_RemoveDefault =
 		(
-			local dntSelectField = _rollout.dntSelectField
-			Assert2.notEquals dntSelectField.text ""
+			local dncSelectField = _rollout.dncSelectField
+			Assert2.notEquals dncSelectField.text ""
 			
-			dntSelectField.focus()
+			dncSelectField.focus()
 			
-			Assert2.equals dntSelectField.text ""
+			Assert2.equals dncSelectField.text ""
 		),
 		
 		
 		function test_GotFocus_KeepCurrent =
 		(
-			local dntSelectField = _rollout.dntSelectField
-			dntSelectField.text = "a"
+			local dncSelectField = _rollout.dncSelectField
+			dncSelectField.text = "a"
 			
-			dntSelectField.focus()
+			dncSelectField.focus()
 			
-			Assert2.equals dntSelectField.text "a"
+			Assert2.equals dncSelectField.text "a"
 		),
 		
 		
 		function test_TextChanged_timerActive =
 		(
 			Assert2.assertFalse (_rollout.tTypingTimer.active)
-			_rollout.dntSelectField.text = "a"
+			_rollout.dncSelectField.text = "a"
 			Assert2.assertTrue (_rollout.tTypingTimer.active)
 		),
 		
 		
 		function test_LostFocus_Default =
 		(
-			_rollout.dntSelectField.focus()
+			_rollout.dncSelectField.focus()
 			setFocus _rollout.btConfig
-			Assert2.notEquals _rollout.dntSelectField.text ""
+			Assert2.notEquals _rollout.dncSelectField.text ""
 		)
 	)
 )

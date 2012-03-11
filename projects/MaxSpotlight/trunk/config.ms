@@ -23,6 +23,8 @@
 		private _configPath = @"",
 		private _sectionName = "Settings",
 		
+		private _watcher,
+		
 		private _valid = true,
 		
 		private _Setting = (
@@ -51,6 +53,38 @@
 		
 		
 		public
+		function createFileSystemWatcherWithTag =
+		(
+			/*
+				Adds the tag object property to the FileSystemWatcher.
+				Credit for goes to denisT from CGTalk.
+			 */
+			
+			local source = ""
+			source += "namespace MXS\n"
+			source += "{\n"
+			source += "	public class FileSystemWatcher: System.IO.FileSystemWatcher { public System.Object Tag; }\n"
+			source += "}\n"
+			
+			local csharpProvider = DotNetObject "Microsoft.CSharp.CSharpCodeProvider"
+			local compilerParams = DotNetObject "System.CodeDom.Compiler.CompilerParameters"
+			compilerParams.ReferencedAssemblies.Add("System.dll");
+			compilerParams.GenerateInMemory = true
+			
+			local compilerResults = csharpProvider.CompileAssemblyFromSource compilerParams #(source)
+			
+			return compilerResults.CompiledAssembly.CreateInstance "MXS.FileSystemWatcher"
+		),
+		
+		
+		public
+		function disableFileWatcher =
+		(
+			_watcher.EnableRaisingEvents = false
+		),
+		
+		
+		public
 		function isValid =
 		(
 			return _valid
@@ -61,6 +95,14 @@
 		function invalidateConfig =
 		(
 			_valid = false
+		),
+		
+		
+		private
+		function onChanged source args =
+		(
+			local this = source.tag.value
+			this.invalidateConfig()
 		),
 		
 		
@@ -114,8 +156,6 @@
 		public
 		function init =
 		(
-			_configPath = getConfigPath()
-			
 			for settingOn in _settings do (
 				local val = getConfigFromINI settingOn.name
 				
@@ -149,7 +189,24 @@
 		function showConfig =
 		(
 			edit _configPath
-			invalidateConfig()
+		),
+		
+		
+		private
+		function initFileSystemWatcher =
+		(
+			_watcher = createFileSystemWatcherWithTag()
+			_watcher.Tag = DotNetMXSValue this
+			_watcher.Path = _configDir
+			_watcher.Filter = _configFilename
+			
+			_watcher.NotifyFilter = _watcher.NotifyFilter.LastWrite
+			
+			DotNet.addEventHandler _watcher "Changed" onChanged
+			DotNet.addEventHandler _watcher "Deleted" onChanged
+			DotNet.addEventHandler _watcher "Renamed" onChanged
+			
+			_watcher.EnableRaisingEvents = true
 		),
 		
 		
@@ -159,7 +216,10 @@
 				throw "Exception on construction. Directory doesn't exist: " inConfigDir
 			
 			_configDir = inConfigDir
+			_configPath = getConfigPath()			
+			
 			init()
+			initFileSystemWatcher()
 		)
 	)
 )
