@@ -14,6 +14,5 @@
 	local GUIWrapper = fileIn @"gui.ms"
 	global maxSpotlight = GUIWrapper()
 	
-	::maxSpotlight.setConfigDir @"K:\"
 	::maxSpotlight.create()
 )
