@@ -54,7 +54,7 @@
 				
 				-- UI
 				-----
-				DotNetControl dntSelectField "System.Windows.Forms.RichTextBox" pos:[2,7] width:93 height:20
+				DotNetControl dncSelectField "System.Windows.Forms.RichTextBox" pos:[2,7] width:93 height:20
 				Button btConfig "C" height:16 width:16 pos:[100,8]
 				Timer tTypingTimer "Typing Timer" interval:0 active:false
 				
@@ -73,7 +73,7 @@
 				-- private
 				function canTimerStart =
 				(
-					return _initSelectFieldFinished and not _dragDropTriggered and isValidText dntSelectField.text
+					return _initSelectFieldFinished and not _dragDropTriggered and isValidText dncSelectField.text
 				)
 				
 				
@@ -115,8 +115,8 @@
 				-- private
 				function resetToSelectedDefaultText =
 				(
-					dntSelectField.text = _config.get #defaultText
-					dntSelectField.selectAll()
+					dncSelectField.text = _config.get #defaultText
+					dncSelectField.selectAll()
 				)
 				
 				
@@ -144,19 +144,19 @@
 				function initSelectField =
 				(
 					local bgCol = colorMan.getColor #window * 255
-					dntSelectField.BackColor = dntSelectField.BackColor.FromARGB bgCol[1] bgCol[2] bgCol[3]
+					dncSelectField.BackColor = dncSelectField.BackColor.FromARGB bgCol[1] bgCol[2] bgCol[3]
 					
-					dntSelectField.AcceptsTab = false
-					dntSelectField.AllowDrop = true
-					dntSelectField.DetectUrls = false
-					dntSelectField.MultiLine = false
-					dntSelectField.Visible = true
-					dntSelectField.RichTextShortcutsEnabled = false
+					dncSelectField.AcceptsTab = false
+					dncSelectField.AllowDrop = true
+					dncSelectField.DetectUrls = false
+					dncSelectField.MultiLine = false
+					dncSelectField.Visible = true
+					dncSelectField.RichTextShortcutsEnabled = false
 					
 					if _config != undefined then 
-						dntSelectField.Text = _config.get #defaultText
+						dncSelectField.Text = _config.get #defaultText
 					
-					dntSelectField.Update()
+					dncSelectField.Update()
 					
 					_initSelectFieldFinished = true
 				)
@@ -189,6 +189,12 @@
 				)
 				
 				
+				on _roMain close do
+				(
+					_config.disableFileWatcher()
+				)
+				
+				
 				on btConfig pressed do
 				(
 					_config.showConfig()
@@ -200,30 +206,30 @@
 					if canListenerBeCleared() then 
 						clearListener()
 					
-					logNodesWhichMatch dntSelectField.text
+					logNodesWhichMatch dncSelectField.text
 					
 					if _config.get #autoSelect then
-						selectAndOptionalLog dntSelectField.text (_config.get #showSelectCount)
+						selectAndOptionalLog dncSelectField.text (_config.get #showSelectCount)
 					
 					stopTimer()
 				)
 				
 				
 				-- SelectField Events
-				on dntSelectField DragDrop sender args do 
+				on dncSelectField DragDrop sender args do 
 				( 
 					loadConfigIfInvalid()
 					
 					local txt = args.data.GetData (_DataFormats.text)
 					if isValidText txt then (
 						local withLogFlag = not _config.get #silentOnDrop and _config.get #showSelectCount
-						selectAndOptionalLog dntSelectField.text withLogFlag
+						selectAndOptionalLog dncSelectField.text withLogFlag
 						
 						if _config.get #silentOnDrop then
 							_dragDropTriggered = true
 						
 						-- Triggers Even TextChanged
-						dntSelectField.text = txt
+						dncSelectField.text = txt
 						
 						stopTimer()
 					) else
@@ -231,14 +237,14 @@
 				)
 				
 				
-				on dntSelectField KeyUp sender args do
+				on dncSelectField KeyUp sender args do
 				(
 					if args.KeyCode == _Keys.Enter then (
 						loadConfigIfInvalid()
 						
-						if isValidText dntSelectField.text then (
-							selectAndOptionalLog dntSelectField.text (_config.get #showSelectCount)
-							dntSelectField.selectAll()
+						if isValidText dncSelectField.text then (
+							selectAndOptionalLog dncSelectField.text (_config.get #showSelectCount)
+							dncSelectField.selectAll()
 							stopTimer()
 						) else
 							resetToSelectedDefaultText()
@@ -246,21 +252,21 @@
 				)
 				
 				
-				on dntSelectField LostFocus sender args do
+				on dncSelectField LostFocus sender args do
 				(
 					loadConfigIfInvalid()
 					
-					if isValidText dntSelectField.text then (
+					if isValidText dncSelectField.text then (
 						if _config.get #lostFocusSelect then
-							selectAndOptionalLog dntSelectField.text (_config.get #showSelectCount)
+							selectAndOptionalLog dncSelectField.text (_config.get #showSelectCount)
 						
 						stopTimer()
 					) else
-						dntSelectField.text = _config.get #defaultText
+						dncSelectField.text = _config.get #defaultText
 				)
 				
 				
-				on dntSelectField TextChanged sender args do 
+				on dncSelectField TextChanged sender args do 
 				(
 					loadConfigIfInvalid()
 					
@@ -273,16 +279,16 @@
 				)
 				
 				
-				on dntSelectField GotFocus sender args do
+				on dncSelectField GotFocus sender args do
 				(
-					if dntSelectField.text == _config.get #defaultText then
-						dntSelectField.text = ""
+					if dncSelectField.text == _config.get #defaultText then
+						dncSelectField.text = ""
 					
-					dntSelectField.selectAll()
+					dncSelectField.selectAll()
 				)
 				
 				
-				on dntSelectField DragEnter sender args do
+				on dncSelectField DragEnter sender args do
 				( 
 					if args.Data.GetDataPresent (_DataFormats.Text) then
 						args.Effect = _DragDropEffects.copy

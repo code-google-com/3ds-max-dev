@@ -98,13 +98,6 @@
 		),
 		
 		
-		function test_showConfig =
-		(
-			_config.showConfig()
-			Assert2.assertFalse (_config.isValid())
-		),
-		
-		
 		function test_init_validateConfig =
 		(
 			_config.invalidateConfig()
