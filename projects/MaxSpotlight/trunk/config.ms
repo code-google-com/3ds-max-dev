@@ -78,7 +78,7 @@
 		
 		
 		public
-		function disableFileWatcher =
+		function disableFileSystemWatcher =
 		(
 			_watcher.EnableRaisingEvents = false
 		),

@@ -191,7 +191,7 @@
 				
 				on _roMain close do
 				(
-					_config.disableFileWatcher()
+					_config.disableFileSystemWatcher()
 				)
 				
 				
@@ -281,6 +281,8 @@
 				
 				on dncSelectField GotFocus sender args do
 				(
+					loadConfigIfInvalid()
+					
 					if dncSelectField.text == _config.get #defaultText then
 						dncSelectField.text = ""
 					
