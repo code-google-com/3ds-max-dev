@@ -15,6 +15,4 @@
 	global maxSpotlight = GUIWrapper()
 	
 	::maxSpotlight.create()
-	
-	ok
 )

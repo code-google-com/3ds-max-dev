@@ -1,9 +1,10 @@
-maxtestDir = @"C:\_dev\maxtest\trunk\"
-	
-fileIn (maxtestDir + @"assert.ms")
-fileIn (maxtestDir + @"finder.ms")
-fileIn (maxtestDir + @"runner.ms")
-fileIn (maxtestDir + @"presenter.ms")
+if not symbolicPaths.isUserPathName "$maxtest" then
+	symbolicPaths.addUserPath "$maxtest" @"C:\_dev\maxtest\trunk\"
+
+fileIn @"$maxtest\assert.ms"
+fileIn @"$maxtest\finder.ms"
+fileIn @"$maxtest\runner.ms"
+fileIn @"$maxtest\presenter.ms"
 
 
 (

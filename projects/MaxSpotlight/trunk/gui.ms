@@ -13,17 +13,9 @@
 	struct GUIWrapper
 	(
 		/*
-			Wrapper for not polluting the global scope with the rollout definition.
-			
-			Local scope alone is not enough.
-			The first execute of the rollout creates a global with the rollout name:
-			globalVars.isGlobal #_roMain
-			The second execute writes the rollout definition in the previously created global roMain.
-			Overwriting whatever was stored in ::_roMain.
-			
-			The struct does not prevent that ::_roMain is created, 
-			but it prevents it from being filled with the rollout definition
-			and preserves whatever was stored in ::_roMain before.
+			Wraps the rollout to allow for advanced configuration.
+			Mainly for configuration which must be done after a dialog was created,
+			like configuration of the config directory.
 		 */
 		
 		private _configDir = (getDir #userScripts),
@@ -218,8 +210,6 @@
 				-- SelectField Events
 				on dncSelectField DragDrop sender args do 
 				( 
-					loadConfigIfInvalid()
-					
 					local txt = args.data.GetData (_DataFormats.text)
 					if isValidText txt then (
 						local withLogFlag = not _config.get #silentOnDrop and _config.get #showSelectCount
@@ -254,8 +244,6 @@
 				
 				on dncSelectField LostFocus sender args do
 				(
-					loadConfigIfInvalid()
-					
 					if isValidText dncSelectField.text then (
 						if _config.get #lostFocusSelect then
 							selectAndOptionalLog dncSelectField.text (_config.get #showSelectCount)
@@ -268,8 +256,6 @@
 				
 				on dncSelectField TextChanged sender args do 
 				(
-					loadConfigIfInvalid()
-					
 					if canTimerStart() then
 						startTimer()
 					else
@@ -291,7 +277,9 @@
 				
 				
 				on dncSelectField DragEnter sender args do
-				( 
+				(
+					loadConfigIfInvalid()
+					
 					if args.Data.GetDataPresent (_DataFormats.Text) then
 						args.Effect = _DragDropEffects.copy
 				)
@@ -307,14 +295,17 @@
 		
 		
 		public
+		function getCurrentRolloutInstance =
+		(
+			_roMain
+		),
+		
+		
+		public
 		function create =
 		(
 			/*
-				Creates the Dialog and docks it.
-				@note: Does a late intialization of the config to allow changing the configDir.
-				
-				@return: The created rollout instance
-				@rtype: Rollout
+				Creates the dialog instance and docks it.
 			 */
 			
 			createDialog _roMain escapeEnable:false width:120 height:34
@@ -323,8 +314,6 @@
 			
 			CUI.registerDialogBar _roMain style:#(#cui_dock_horz, #cui_floatable, #cui_handles)
 			CUI.dockDialogBar _roMain #cui_dock_top
-			
-			_roMain
 		),
 		
 		

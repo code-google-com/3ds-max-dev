@@ -14,6 +14,9 @@
 	(
 		/*
 			Struct for loading and storing the settings.
+			
+			@note: To prevent FileSystemWatcher to call its event functions,
+			make sure to call disableFileSystemWatcher when you are done with the Configurator.
 		 */
 		
 		public inConfigDir,

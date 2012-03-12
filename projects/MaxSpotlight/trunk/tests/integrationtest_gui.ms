@@ -43,7 +43,8 @@
 		
 		function test_create_pos =
 		(
-			local ro = _gui.create()
+			_gui.create()
+			local ro = _gui.getCurrentRolloutInstance()
 			local pos = getDialogPos ro
 			Assert2.notEquals pos [0,0]
 		),
@@ -71,7 +72,8 @@
 			local configDir = testHelper.getConfigDir()
 			_gui = GUIWrapper()
 			_gui.setConfigDir configDir
-			_rollout = _gui.create()
+			_gui.create()
+			_rollout = _gui.getCurrentRolloutInstance()
 		),
 		
 		
