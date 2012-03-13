@@ -9,6 +9,8 @@
  */
 
 (
+	-- Version 1.7.0
+
 	try(::maxSpotlight.destroy()) catch()
 	
 	local GUIWrapper = fileIn @"gui.ms"
