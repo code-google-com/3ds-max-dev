@@ -1,4 +1,5 @@
 #summary Documentation for the MaxSpotlight tool
+#labels Featured
 #sidebar ProjectMaxSpotlightTableOfContents
 
 = Description =
