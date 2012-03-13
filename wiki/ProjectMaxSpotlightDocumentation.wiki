@@ -31,8 +31,8 @@ Tested with:
 = How to use =
 
 
-*3Ds Max - Typing* (see Figure 1.)
- 1. Open the Listener to see search results (see Figure 2.)
+*3Ds Max - Typing*
+ 1. Open the Listener to see search results
  1. Type into the text box
  1. All objects which include the string will be listed
  1. Press Enter to select all listed objects
