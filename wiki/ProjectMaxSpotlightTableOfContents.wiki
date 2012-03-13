@@ -5,7 +5,6 @@
   * [ProjectMaxSpotlightDocumentation#Requirements Requirements]
   * [ProjectMaxSpotlightDocumentation#Install Install]
   * [ProjectMaxSpotlightDocumentation#How_to_use How to use]
-
   * [ProjectMaxSpotlightDocumentation#Properties Properties]
   * [ProjectMaxSpotlightDocumentation#Last_thoughts Last thoughts]
   * [ProjectMaxSpotlightDocumentation#External_links External links]
