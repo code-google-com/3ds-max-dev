@@ -48,7 +48,7 @@
 			_Setting name:#showNames 		type:BooleanClass 	default:true,
 			_Setting name:#showCount 		type:BooleanClass 	default:true,
 			_Setting name:#showSelectCount 	type:BooleanClass 	default:true,
-			_Setting name:#lostFocusSelect 	type:BooleanClass 	default:true,
+			_Setting name:#lostFocusSelect 	type:BooleanClass 	default:false,
 			_Setting name:#silentOnDrop 	type:BooleanClass 	default:true,
 			_Setting name:#typingTimerInMs	type:Integer		default:300,
 			_Setting name:#lineLimit		type:Integer		default:100
