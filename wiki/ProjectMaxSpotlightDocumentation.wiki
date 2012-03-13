@@ -3,12 +3,12 @@
 = Description =
 Tool for selecting and finding objects by name with a quick and spotlight-like search behavior.
 
-
+*<br/>*
 = Requirements =
 Tested with:
 3ds max 2011/2012 (64bit)
 
-
+*<br/>*
 = Install =
 *Recommended*
  
@@ -21,6 +21,7 @@ Tested with:
  1. Choose from the Menu Bar MAXScript and then _Run script..._
  1. Browse to and open the run.ms
 
+*<br/>*
 = How to use =
 *3Ds Max - Typing* (see Figure 1.)
  1. Open the Listener to see search results (see Figure 2.)
@@ -39,6 +40,7 @@ Tested with:
  * if multiple nodes have the same name and you type an exact match, both nodes are selected
  e.g.: you have three nodes _sphere01_, _sphere01_ and _sphere01a_ and enter "sphere01", it will select both nodes _sphere01_, but not _sphere01a_
 
+*<br/>*
 = Properties =
 You can configure `MaxSpotlight`s behavior to your needs by altering the `MaxSpotlight.ini`.
 Press the "C" button in the GUI to get it open.
@@ -75,11 +77,13 @@ Press the "C" button in the GUI to get it open.
  Limits the number of found nodes printed to the listener.
  0 will deactivate the limit.
 
+*<br/>*
 = Last thoughts =
 Handy tool and time saver if you have an node naming convention established.
 Some tools I use, print node names to the listener.
 I now can double click to select the node name and drag & drop them over to `MaxSpotlight` to select the node
 
+*<br/>*
 = External links =
 Video showing the script in action:
 [http://www.pixelbaker.com/?action=player&url=11106037&w=500&h=375 Demo MaxSpotlight v1.6.3]
