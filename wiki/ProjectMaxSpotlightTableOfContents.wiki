@@ -1,0 +1,11 @@
+#summary Table of Contents for the MaxSpotlight documentation
+
+ * [ProjectMaxSpotlightDocumentation MaxSpotlight Documentation]
+  * [ProjectMaxSpotlightDocumentation#Description Description ]
+  * [ProjectMaxSpotlightDocumentation#Requirements Requirements]
+  * [ProjectMaxSpotlightDocumentation#Install Install]
+  * [ProjectMaxSpotlightDocumentation#How_to_use How to use]
+
+  * [ProjectMaxSpotlightDocumentation#Properties Properties]
+  * [ProjectMaxSpotlightDocumentation#Last_thoughts Last thoughts]
+  * [ProjectMaxSpotlightDocumentation#External_links External links]
