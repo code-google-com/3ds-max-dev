@@ -1,8 +1,12 @@
-#summary One-sentence summary of this page.
+#summary Documentation for the MaxSpotlight tool
 #sidebar ProjectMaxSpotlightTableOfContents
 
 = Description =
 Tool for selecting and finding objects by name with a quick and spotlight-like search behavior.
+
+http://3ds-max-dev.googlecode.com/svn/wiki/images/projects/MaxSpotlight/gui.png
+
+http://3ds-max-dev.googlecode.com/svn/wiki/images/projects/MaxSpotlight/result.png
 
 *<br/>*
 = Requirements =
@@ -24,6 +28,8 @@ Tested with:
 
 *<br/>*
 = How to use =
+
+
 *3Ds Max - Typing* (see Figure 1.)
  1. Open the Listener to see search results (see Figure 2.)
  1. Type into the text box
@@ -31,7 +37,7 @@ Tested with:
  1. Press Enter to select all listed objects
 
 *3Ds Max - Drag & Drop*
- 1. You can drag text into the TextBox
+ 1. You can drag text into the text box
  1. If an object matches the string, it will be selected.
 
 *General*
