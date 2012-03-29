@@ -211,9 +211,10 @@
 				on dncSelectField DragDrop sender args do 
 				( 
 					local txt = args.data.GetData (_DataFormats.text)
+					
 					if isValidText txt then (
 						local withLogFlag = not _config.get #silentOnDrop and _config.get #showSelectCount
-						selectAndOptionalLog dncSelectField.text withLogFlag
+						selectAndOptionalLog txt withLogFlag
 						
 						if _config.get #silentOnDrop then
 							_dragDropTriggered = true

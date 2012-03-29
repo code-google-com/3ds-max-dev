@@ -9,7 +9,7 @@
  */
 
 (
-	-- Version 1.7.0
+	-- Version 1.7.1
 
 	try(::maxSpotlight.destroy()) catch()
 	
