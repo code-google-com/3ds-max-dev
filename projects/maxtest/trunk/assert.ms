@@ -455,7 +455,7 @@ struct Assert2
 		try
 		(
 			local fnCallString = Assert2._createGlobalFnCallString fnPointer args keywords
-			execute fnCallString
+			Assert2._catchConstructorException fnCallString
 		)
 		catch
 		(
