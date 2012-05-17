@@ -21,13 +21,13 @@
 		function isSciptedStructDefinitionHandlerException exceptionStr = 
 		(
 			/*
-			 *	Tests if a string contains the signature of a exception raised during construction.
-			 *
-			 *	@param exceptionStr: the exception		 
-			 *	@type exceptionStr: String
-			 *	
-			 *	@return: True if exceptionStr contains the pattern describing an exception during construction
-			 *	@rtype: bool
+				Tests if a string contains the signature of a exception raised during construction.
+				
+				@param exceptionStr: the exception		 
+				@type exceptionStr: String
+				
+				@return: True if exceptionStr contains the pattern describing an exception during construction
+				@rtype: bool
 			 */
 			
 			local pattern = #'*MAXScript Scripted Struct Definition Handler Exception:*'
@@ -77,7 +77,7 @@
 					format " args[%]" i to:structStream
 				
 				for i=1 to keywords.count do
-					format " %:keywords[%].v1" keywords[i].v2 i to:structStream
+					format " %:keywords[%].v2" keywords[i].v1 i to:structStream
 			)
 			
 			format "\n" to:structStream
@@ -136,7 +136,7 @@
 				@keyword stacklevel: return the file and line number of a specific stacklevel
 				@keyword stacklevel: Integer
 				
-				@return: returns file and line number
+				@return: returns file and line number, empty String if none found
 				@rtype: String
 			 */
 			
@@ -200,13 +200,13 @@
 	struct MaxtestAssert
 	(
 		/*
-		 *	Assert class for custom asserts used inside the maxtest framework.
-		 *	This struct merly groups the functionality to not clutter the global scope with different asserts.
-		 *	
-		 *	Be aware that the assert functions collaborate with clearing the listener.
-		 *	Don't keep important information in your listener when using these asserts.
-		 * 
-		 *	@info: equals and notEquals doesn not compare item of two arrays, it only compares the memory address
+			Assert class for custom asserts used inside the maxtest framework.
+			This struct merly groups the functionality to not clutter the global scope with different asserts.
+			
+			Be aware that the assert functions collaborate with clearing the listener.
+			Don't keep important information in your listener when using these asserts.
+			
+			@info: equals and notEquals doesn not compare item of two arrays, it only compares the memory address
 		 */
 		
 		private _util = AssertUtil(),
@@ -216,13 +216,13 @@
 		function assertTrue expr message:"" =
 		(
 			/*
-			 *	Verifies that the expression is True.
-			 *	
-			 *	@param expr: the expression to test if true
-			 *	@type expr: bool
-			 *	
-			 *	@keyword message: custom message displayed when assert fails
-			 *	@type args: String
+				Verifies that the expression is True.
+				
+				@param expr: the expression to test if true
+				@type expr: bool
+				
+				@keyword message: custom message displayed when assert fails
+				@type args: String
 			 */
 			
 			clearListener()
@@ -233,9 +233,9 @@
 			if not assertState then (
 				local exceptionStr = _util.getListenerContent()
 				local fileLineInfo = _util.locateAssert exceptionStr
-				local resultDescription = _util.formatResultDescription "assert2.equals" message expr "isn't" True fileLineInfo
+				local resultDescription = _util.formatResultDescription "assert2.assertTrue" message expr "isn't" True fileLineInfo
 				
-				throw (resultDescription)
+				throw resultDescription
 			)
 		),
 		
@@ -244,13 +244,13 @@
 		function assertFalse expr message:"" =
 		(
 			/*
-			 *	Verifies that the expression is False.
-			 *	
-			 *	@param expr: the expression to test if false
-			 *	@type expr: bool
-			 *	
-			 *	@keyword message: custom message displayed when assert fails
-			 *	@type args: String
+				Verifies that the expression is False.
+				
+				@param expr: the expression to test if false
+				@type expr: bool
+				
+				@keyword message: custom message displayed when assert fails
+				@type args: String
 			 */
 			
 			clearListener()
@@ -261,9 +261,9 @@
 			if not assertState then (
 				local exceptionStr = _util.getListenerContent()
 				local fileLineInfo = _util.locateAssert exceptionStr
-				local resultDescription = _util.formatResultDescription "assert2.equals" message expr "isn't" False fileLineInfo
+				local resultDescription = _util.formatResultDescription "assert2.assertFalse" message expr "is" False fileLineInfo
 				
-				throw (resultDescription)
+				throw resultDescription
 			)
 		),
 		
@@ -271,19 +271,19 @@
 		public
 		function equals testVal expectedVal message:"" =
 		(
-			/**
-			 *	Compares two values for equality and throws an exception if not equal.
-			 *	If not equal the stack gets printed to the listener and copied and parsed
-			 *	to locate the file and line, where the assert failed.
-			 *
-			 *	@param testVal: the value to be compared with the expected value
-			 *	@type testVal: Value
-			 *
-			 *	@param expectedVal: the value which test value has to equal
-			 *	@type expectedVal: Value
-			 *
-			 *	@keyword message: custom message displayed when assert fails
-			 *	@type args: String
+			/*
+				Compares two values for equality and throws an exception if not equal.
+				If not equal the stack gets printed to the listener and copied and parsed
+				to locate the file and line, where the assert failed.
+				
+				@param testVal: the value to be compared with the expected value
+				@type testVal: Value
+				
+				@param expectedVal: the value which test value has to equal
+				@type expectedVal: Value
+				
+				@keyword message: custom message displayed when assert fails
+				@type args: String
 			 */
 			
 			clearListener()
@@ -296,7 +296,7 @@
 				local fileLineInfo = _util.locateAssert exceptionStr
 				local resultDescription = _util.formatResultDescription "assert2.equals" message testVal "!=" expectedVal fileLineInfo
 				
-				throw (resultDescription)
+				throw resultDescription
 			)
 		),
 		
@@ -305,16 +305,16 @@
 		function notEquals testVal expectedVal message:"" =
 		(
 			/*
-			 *	Asserts that testVal equals expectedVal
-			 *	
-			 *	@param testVal: the value not to match the expected value
-			 *	@type testVal: Value
-			 *
-			 *	@param expectedVal: the value to be expected not to equal test value
-			 *	@type expectedVal: Value
-			 *
-			 *	@keyword message: custom message displayed when assert fails
-			 *	@type args: String
+				Asserts that testVal equals expectedVal
+				
+				@param testVal: the value not to match the expected value
+				@type testVal: Value
+				
+				@param expectedVal: the value to be expected not to equal test value
+				@type expectedVal: Value
+				
+				@keyword message: custom message displayed when assert fails
+				@type args: String
 			 */
 			
 			clearListener()
@@ -327,7 +327,7 @@
 				local fileLineInfo = _util.locateAssert exceptionStr
 				local resultDescription = _util.formatResultDescription "assert2.notEquals" message testVal "==" expectedVal fileLineInfo
 				
-				throw (resultDescription)
+				throw resultDescription
 			)
 		),
 		
@@ -336,22 +336,22 @@
 		function raises errorMsgPattern fnPointer args:#() keywords:#() message:"" =
 		(
 			/*
-			 *	Checks if function run with certain parameters raises an exception with a certain string.
-			 *
-			 *	@param errorMsgPattern: the pattern of the error message, so the assert succeeds
-			 *	@type errorMsgPattern: String
-			 *
-			 *	@param fnPointer: the function to be tested
-			 *	@type fnPointer: MAXScriptFunction
-			 *
-			 *	@param args: the arguments for running the function
-			 *	@type args: #(Value)
-			 *
-			 *	@keyword keywords: the keywords for running the function
-			 *	@type keywords: #(DataPair(String, Value))
-			 *
-			 *	@keyword message: custom message displayed when assert fails
-			 *	@type args: String
+				Checks if function run with certain parameters raises an exception with a certain string.
+				
+				@param errorMsgPattern: the pattern of the error message, so the assert succeeds
+				@type errorMsgPattern: String
+				
+				@param fnPointer: the function to be tested
+				@type fnPointer: MAXScriptFunction
+				
+				@param args: the arguments for running the function
+				@type args: #(Value)
+				
+				@keyword keywords: the keywords for running the function
+				@type keywords: #(DataPair(String, Value))
+				
+				@keyword message: custom message displayed when assert fails
+				@type args: String
 			 */
 			
 			local expectedExceptionRaised = false
@@ -364,7 +364,7 @@
 			)
 			catch (
 				exceptionStr = getCurrentException()
-				if MatchPattern exceptionStr pattern:errorMsgPattern then
+				if matchPattern exceptionStr pattern:errorMsgPattern then
 					expectedExceptionRaised = true
 			)
 			
@@ -374,7 +374,6 @@
 				stack showLocals:True firstFrameOnly:false to:exceptionStream
 				
 				local fileLineInfo = _util.locateAssert (exceptionStream as String)
-				
 				local resultDescription = _util.formatResultDescription "assert2.raises" message errorMsgPattern "pattern doesn't match" exceptionStr fileLineInfo   
 				
 				throw resultDescription
@@ -386,20 +385,20 @@
 		function notRaises fnPointer args:#() keywords:#() message:"" =
 		(
 			/*
-			 *	Checks if function run with certain parameters doesn't raise any exception.
-			 *	@info: if no exception should be raised, make errorMsgPattern == ""
-			 *	
-			 *	@param fnPointer: the function to be tested
-			 *	@type fnPointer: MAXScriptFunction
-			 *
-			 *	@keyword args: the arguments for running the function
-			 *	@type args: #(Value)
-			 *
-			 *	@keyword keywords: the keywords for running the function
-			 *	@type keywords: #(DataPair(String, Value))
-			 *
-			 *	@keyword message: custom message displayed when assert fails
-			 *	@type args: String
+				Checks if function run with certain parameters doesn't raise any exception.
+				@info: if no exception should be raised, make errorMsgPattern == ""
+				
+				@param fnPointer: the function to be tested
+				@type fnPointer: MAXScriptFunction
+				
+				@keyword args: the arguments for running the function
+				@type args: #(Value)
+				
+				@keyword keywords: the keywords for running the function
+				@type keywords: #(DataPair(String, Value))
+				
+				@keyword message: custom message displayed when assert fails
+				@type args: String
 			 */
 			
 			local exceptionRaised = false
@@ -418,7 +417,6 @@
 				stack showLocals:True firstFrameOnly:false to:exceptionStream
 				
 				local fileLineInfo = _util.locateAssert (exceptionStream as String)
-				
 				local resultDescription = _util.formatResultDescription "assert2.notRaises" message "Exception was raised" ">>" exceptionStr fileLineInfo
 				
 				throw resultDescription
