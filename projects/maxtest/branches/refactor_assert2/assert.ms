@@ -30,8 +30,7 @@
 				@rtype: bool
 			 */
 			
-			local pattern = #'*MAXScript Scripted Struct Definition Handler Exception:*'
-			return matchPattern exceptionStr pattern:pattern
+			return matchPattern exceptionStr pattern:#'*MAXScript Scripted Struct Definition Handler Exception:*'
 		),
 		
 		
@@ -367,7 +366,6 @@
 				if matchPattern exceptionStr pattern:errorMsgPattern then
 					expectedExceptionRaised = true
 			)
-			
 			
 			if not expectedExceptionRaised then (
 				local exceptionStream = StringStream ""
