@@ -196,6 +196,8 @@ Commenting out a test or a whole suite doesn't exclude the it from being run. Th
 
 *<br/>*
 = Roadmap =
+== assert message being added to the `MaxTestResult` ==
+
 == Implement profiling for tests ==
 Allow for logging run time of a check.
 Allow for logging memory consumption of a check.
