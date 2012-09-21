@@ -123,7 +123,7 @@ struct DirCrawler
 			local afterPatternPos = filePos fstream
 			
 			-- Move cursor back to begin of struct name
-			seek fstream (afterPatternPos - this.structPattern.count)
+			seek fstream (afterPatternPos - this.structPattern.count - 1)
 			
 			do 
 			(
