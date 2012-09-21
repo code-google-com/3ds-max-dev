@@ -116,8 +116,7 @@
 			 *	This function doesn't close the filestream.
 			 */
 			
-			-- Move cursor back to begin of struct name
-			seek fstream (afterPatternPos - this.structPattern.count - 1)
+			local structNames = #()
 			
 			seek fstream 0
 			
