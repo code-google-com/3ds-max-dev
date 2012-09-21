@@ -193,6 +193,9 @@ Comparing two MAXScript arrays with each other doesn't work. The compare only te
 == Commenting out Suite/Test ==
 Commenting out a test or a whole suite doesn't exclude the it from being run. The finder still finds the suite/test, because currently it doesn't consider comments. Cause the finder finds the suite/test, the runner then still tries to execute it, which results in an exception, because on execution the commented out code is not interpreted and missing.
 
+== DirCrawler ==
+Keyword `structPattern`: you cannot specify the entire name of the struct, you have to leave off at least on letter. Also doesn't take any wildcards, so Pattern is a bad name.
+
 
 *<br/>*
 = Roadmap =
