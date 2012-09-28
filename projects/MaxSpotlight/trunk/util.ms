@@ -67,8 +67,15 @@
 		public
 		function logFoundNumNodes numNodes =
 		(
-			
 			logNumNodes "Found" numNodes
+		),
+		
+		
+		private
+		function wrapInWildcards inStr =
+		(
+			inStr = trimLeft (trimRight inStr "*") "*"
+			return "*" + inStr + "*"
 		),
 		
 		
@@ -80,7 +87,7 @@
 			if exactHits.count > 0 then
 				return exactHits
 			else (
-				local pattern = "*" + txt + "*"
+				local pattern = wrapInWildcards txt
 				return for nodeOn in objects where matchPattern nodeOn.name pattern:pattern collect nodeOn			
 			)
 		),

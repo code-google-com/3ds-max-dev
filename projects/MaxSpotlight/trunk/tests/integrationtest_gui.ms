@@ -16,7 +16,7 @@
 		function setUp = 
 		(
 			local configDir = testHelper.getConfigDir()
-			_gui = GUIWrapper()
+			_gui = GUIWrapper.getInstance()
 			_gui.setConfigDir configDir
 		),
 		
@@ -30,14 +30,14 @@
 		
 		function test_create_notRaises =
 		(
-			Assert2.notRaises _gui.create
+			assert2.notRaises _gui.create
 		),
 		
 		
 		function xtest_destroy_notRaises =
 		(
 			_gui.create()
-			Assert2.notRaises _gui.destroy
+			assert2.notRaises _gui.destroy
  		),
 		
 		
@@ -46,16 +46,16 @@
 			_gui.create()
 			local ro = _gui.getCurrentRolloutInstance()
 			local pos = getDialogPos ro
-			Assert2.notEquals pos [0,0]
+			assert2.notEquals pos [0,0]
 		),
 		
 		
 		function test_create_configFileExists =
 		(
 			local configPath = testHelper.getConfigPath()
-			Assert2.assertFalse (doesFileExist configPath)
+			assert2.assertFalse (doesFileExist configPath)
 			_gui.create()
-			Assert2.assertTrue (doesFileExist configPath)
+			assert2.assertTrue (doesFileExist configPath)
 		)
 	)
 	
@@ -70,7 +70,7 @@
 		function setUp = 
 		(
 			local configDir = testHelper.getConfigDir()
-			_gui = GUIWrapper()
+			_gui = GUIWrapper.getInstance()
 			_gui.setConfigDir configDir
 			_gui.create()
 			_rollout = _gui.getCurrentRolloutInstance()
@@ -87,11 +87,11 @@
 		function test_GotFocus_RemoveDefault =
 		(
 			local dncSelectField = _rollout.dncSelectField
-			Assert2.notEquals dncSelectField.text ""
+			assert2.notEquals dncSelectField.text ""
 			
 			dncSelectField.focus()
 			
-			Assert2.equals dncSelectField.text ""
+			assert2.equals dncSelectField.text ""
 		),
 		
 		
@@ -102,15 +102,15 @@
 			
 			dncSelectField.focus()
 			
-			Assert2.equals dncSelectField.text "a"
+			assert2.equals dncSelectField.text "a"
 		),
 		
 		
 		function test_TextChanged_timerActive =
 		(
-			Assert2.assertFalse (_rollout.tTypingTimer.active)
+			assert2.assertFalse (_rollout.tTypingTimer.active)
 			_rollout.dncSelectField.text = "a"
-			Assert2.assertTrue (_rollout.tTypingTimer.active)
+			assert2.assertTrue (_rollout.tTypingTimer.active)
 		),
 		
 		
@@ -118,7 +118,7 @@
 		(
 			_rollout.dncSelectField.focus()
 			setFocus _rollout.btConfig
-			Assert2.notEquals _rollout.dncSelectField.text ""
+			assert2.notEquals _rollout.dncSelectField.text ""
 		)
 	)
 )

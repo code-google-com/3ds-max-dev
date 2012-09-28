@@ -1,7 +1,4 @@
 (
-	local CURRENT_SCRIPT_DIR = getFilenamePath (getSourceFileName())
-	
-	
 	local TestHelper
 	struct TestHelper
 	(
@@ -16,7 +13,7 @@
 		public
 		function getConfigDir =
 		(
-			return CURRENT_SCRIPT_DIR
+			return SysInfo.tempDir
 		),
 		
 		

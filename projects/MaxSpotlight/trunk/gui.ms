@@ -22,12 +22,12 @@
 		
 		
 		private _roMain = (
-			rollout _roMain "MaxSpotlight"
+			rollout _roMain "v1.7.2"
 			(
 				/*
 					The input text field for querying nodes in the current scene.
-					@note: when dialog is created,
-					immediately call initConfig with a path to where the ini should be stored.
+					@note:  when dialog is created,
+							immediately call initConfig with a path to where the ini should be stored.
 				 */
 				
 				-- Local
@@ -54,45 +54,38 @@
 				-- Function
 				-----------
 				
-				
-				-- private
-				function isValidText txt =
+				function _isValidText txt =
 				(
 					return txt != "" and not isSpace txt and txt != (_config.get #defaultText)
 				)
 				
 				
-				-- private
-				function canTimerStart =
+				function _canTimerStart =
 				(
-					return _initSelectFieldFinished and not _dragDropTriggered and isValidText dncSelectField.text
+					return _initSelectFieldFinished and not _dragDropTriggered and _isValidText dncSelectField.text
 				)
 				
 				
-				-- private
-				function startTimer =
+				function _startTimer =
 				(
 					tTypingTimer.interval = _config.get #typingTimerInMs
 					tTypingTimer.active = true
 				)
 				
 				
-				-- private
-				function stopTimer =
+				function _stopTimer =
 				(
 					tTypingTimer.active = false
 				)
 				
 				
-				-- private
-				function canListenerBeCleared =
+				function _canListenerBeCleared =
 				(
 					return (_config.get #clearListener) and _initSelectFieldFinished
 				)
 				
 				
-				-- private
-				function logNodesWhichMatch txt =
+				function _logNodesWhichMatch txt =
 				(
 					local nodeNames = _util.getNodeNamesWithExactOrPatternMatch txt
 					
@@ -104,16 +97,14 @@
 				)
 				
 				
-				-- private
-				function resetToSelectedDefaultText =
+				function _resetToSelectedDefaultText =
 				(
 					dncSelectField.text = _config.get #defaultText
 					dncSelectField.selectAll()
 				)
 				
 				
-				-- private
-				function selectAndOptionalLog txt withLog =
+				function _selectAndOptionalLog txt withLog =
 				(
 					if withLog then
 						_util.selectNodesAndLog txt
@@ -122,8 +113,7 @@
 				)
 				
 				
-				-- private
-				function loadConfigIfInvalid =
+				function _loadConfigIfInvalid =
 				(
 					if not _config.isValid() then (
 						_config.init()
@@ -132,8 +122,7 @@
 				)
 				
 				
-				-- private
-				function initSelectField =
+				function _initSelectField =
 				(
 					local bgCol = colorMan.getColor #window * 255
 					dncSelectField.BackColor = dncSelectField.BackColor.FromARGB bgCol[1] bgCol[2] bgCol[3]
@@ -154,22 +143,10 @@
 				)
 				
 				
-				-- public
 				function initConfig inConfigDir =
 				(
 					_config = _Configurator inConfigDir
-					initSelectField()
-				)
-				
-				
-				-- private
-				function initConfigAndUtil =
-				(
-					local Configurator = fileIn "config.ms"
-					_config = Configurator()
-					
-					local SelectAndLogUtil = fileIn "util.ms"
-					_util = SelectAndLogUtil()
+					_initSelectField()
 				)
 				
 				
@@ -177,13 +154,13 @@
 				--------
 				on _roMain open do 
 				(
-					initSelectField()
+					_initSelectField()
 				)
 				
 				
 				on _roMain close do
 				(
-					_config.disableFileSystemWatcher()
+					_config.dispose()
 				)
 				
 				
@@ -195,15 +172,15 @@
 				
 				on tTypingTimer tick do
 				(
-					if canListenerBeCleared() then 
+					if _canListenerBeCleared() then 
 						clearListener()
 					
-					logNodesWhichMatch dncSelectField.text
+					_logNodesWhichMatch dncSelectField.text
 					
 					if _config.get #autoSelect then
-						selectAndOptionalLog dncSelectField.text (_config.get #showSelectCount)
+						_selectAndOptionalLog dncSelectField.text (_config.get #showSelectCount)
 					
-					stopTimer()
+					_stopTimer()
 				)
 				
 				
@@ -212,44 +189,44 @@
 				( 
 					local txt = args.data.GetData (_DataFormats.text)
 					
-					if isValidText txt then (
+					if _isValidText txt then (
 						local withLogFlag = not _config.get #silentOnDrop and _config.get #showSelectCount
-						selectAndOptionalLog txt withLogFlag
+						_selectAndOptionalLog txt withLogFlag
 						
 						if _config.get #silentOnDrop then
 							_dragDropTriggered = true
 						
-						-- Triggers Even TextChanged
+						-- Triggers Event TextChanged
 						dncSelectField.text = txt
 						
-						stopTimer()
+						_stopTimer()
 					) else
-						resetToSelectedDefaultText()
+						_resetToSelectedDefaultText()
 				)
 				
 				
 				on dncSelectField KeyUp sender args do
 				(
 					if args.KeyCode == _Keys.Enter then (
-						loadConfigIfInvalid()
+						_loadConfigIfInvalid()
 						
-						if isValidText dncSelectField.text then (
-							selectAndOptionalLog dncSelectField.text (_config.get #showSelectCount)
+						if _isValidText dncSelectField.text then (
+							_selectAndOptionalLog dncSelectField.text (_config.get #showSelectCount)
 							dncSelectField.selectAll()
-							stopTimer()
+							_stopTimer()
 						) else
-							resetToSelectedDefaultText()
+							_resetToSelectedDefaultText()
 					)
 				)
 				
 				
 				on dncSelectField LostFocus sender args do
 				(
-					if isValidText dncSelectField.text then (
+					if _isValidText dncSelectField.text then (
 						if _config.get #lostFocusSelect then
-							selectAndOptionalLog dncSelectField.text (_config.get #showSelectCount)
+							_selectAndOptionalLog dncSelectField.text (_config.get #showSelectCount)
 						
-						stopTimer()
+						_stopTimer()
 					) else
 						dncSelectField.text = _config.get #defaultText
 				)
@@ -257,10 +234,10 @@
 				
 				on dncSelectField TextChanged sender args do 
 				(
-					if canTimerStart() then
-						startTimer()
+					if _canTimerStart() then
+						_startTimer()
 					else
-						stopTimer()
+						_stopTimer()
 					
 					_dragDropTriggered = false
 				)
@@ -268,7 +245,7 @@
 				
 				on dncSelectField GotFocus sender args do
 				(
-					loadConfigIfInvalid()
+					_loadConfigIfInvalid()
 					
 					if dncSelectField.text == _config.get #defaultText then
 						dncSelectField.text = ""
@@ -279,10 +256,10 @@
 				
 				on dncSelectField DragEnter sender args do
 				(
-					loadConfigIfInvalid()
+					_loadConfigIfInvalid()
 					
-					if args.Data.GetDataPresent (_DataFormats.Text) then
-						args.Effect = _DragDropEffects.copy
+					if args.Data.GetDataPresent _DataFormats.Text then
+						args.Effect = _DragDropEffects.Copy
 				)
 			)
 		),
@@ -298,7 +275,7 @@
 		public
 		function getCurrentRolloutInstance =
 		(
-			_roMain
+			return _roMain
 		),
 		
 		
@@ -309,6 +286,7 @@
 				Creates the dialog instance and docks it.
 			 */
 			
+			try(::maxSpotlight.destroy()) catch()
 			createDialog _roMain escapeEnable:false width:120 height:34
 			
 			_roMain.initConfig _configDir
@@ -323,6 +301,22 @@
 		(
 			try(CUI.unRegisterDialogBar _roMain) catch()
 			try(destroyDialog _roMain) catch()
+		),
+		
+		
+		public
+		function getInstance =
+		(
+			if ::maxSpotlight == undefined then
+				GUIWrapper()
+			return ::maxSpotlight
+		),
+		
+		
+		on create do
+		(
+			try(::maxSpotlight.destroy()) catch()
+			global maxSpotlight = this
 		)
 	)
 )

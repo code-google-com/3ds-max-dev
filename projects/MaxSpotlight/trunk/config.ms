@@ -16,7 +16,7 @@
 			Struct for loading and storing the settings.
 			
 			@note: To prevent FileSystemWatcher to call its event functions,
-			make sure to call disableFileSystemWatcher when you are done with the Configurator.
+			make sure to call dispose when you are done with the Configurator.
 		 */
 		
 		public inConfigDir,
@@ -56,122 +56,9 @@
 		
 		
 		public
-		function createFileSystemWatcherWithTag =
-		(
-			/*
-				Adds the tag object property to the FileSystemWatcher.
-				Credit for goes to denisT from CGTalk.
-			 */
-			
-			local source = ""
-			source += "namespace MXS\n"
-			source += "{\n"
-			source += "	public class FileSystemWatcher: System.IO.FileSystemWatcher { public System.Object Tag; }\n"
-			source += "}\n"
-			
-			local csharpProvider = DotNetObject "Microsoft.CSharp.CSharpCodeProvider"
-			local compilerParams = DotNetObject "System.CodeDom.Compiler.CompilerParameters"
-			compilerParams.ReferencedAssemblies.Add("System.dll");
-			compilerParams.GenerateInMemory = true
-			
-			local compilerResults = csharpProvider.CompileAssemblyFromSource compilerParams #(source)
-			
-			return compilerResults.CompiledAssembly.CreateInstance "MXS.FileSystemWatcher"
-		),
-		
-		
-		public
-		function disableFileSystemWatcher =
-		(
-			_watcher.EnableRaisingEvents = false
-		),
-		
-		
-		public
 		function isValid =
 		(
 			return _valid
-		),
-		
-		
-		public
-		function invalidateConfig =
-		(
-			_valid = false
-		),
-		
-		
-		private
-		function onChanged source args =
-		(
-			local this = source.tag.value
-			this.invalidateConfig()
-		),
-		
-		
-		private
-		function getConfigPath =
-		(
-			return PathConfig.appendPath _configDir _configFilename
-		),
-		
-		
-		private
-		function setConfigValue inKey inVal =
-		(
-			setINISetting _configPath _sectionName inKey (inVal as String)
-			
-		),
-		
-		
-		private
-		function isSet val =
-		(
-			return val != ""
-		),
-		
-		
-		private
-		function getConfigFromINI inKey =
-		(
-			return getINISetting _configPath _sectionName inKey
-		),
-		
-		
-		private
-		function castValue val config =
-		(
-			local castedVal
-			try (castedVal = val as (config.type)) catch ()
-			
-			if castedVal == undefined then (
-				castedVal = config.default
-				
-				local pattern = "<MaxSpotlight> Setting '%' with value '%' couldn't be cast to %. " +
-					"Using default: %. Check your setting file.\n"
-				format pattern (config.name as String) val config.type config.default
-			)
-			
-			return castedVal
-		),
-		
-		
-		public
-		function init =
-		(
-			for settingOn in _settings do (
-				local val = getConfigFromINI settingOn.name
-				
-				if not isSet val then (
-					val = settingOn.default
-					setConfigValue settingOn.name val
-				)
-				
-				local castedVal = castValue val settingOn				
-				settingOn.val = castedVal
-			)
-			
-			_valid = true
 		),
 		
 		
@@ -195,6 +82,59 @@
 		),
 		
 		
+		public
+		function dispose =
+		(
+			_watcher.EnableRaisingEvents = false
+			DotNet.removeAllEventHandlers _watcher
+			_watcher = undefined
+		),
+		
+		
+		public
+		function invalidateConfig =
+		(
+			_valid = false
+		),
+		
+		
+		private
+		function watcher_OnChanged source args =
+		(
+			local this = source.Tag.value
+			this.invalidateConfig()
+		),
+		
+		
+		private
+		function createFileSystemWatcherWithTag =
+		(
+			/*
+				Adds the tag object property to the FileSystemWatcher.
+				Credit for goes to denisT from CGTalk.
+			 */
+			
+			local source = "
+				namespace MXS
+				{
+					public class FileSystemWatcher: System.IO.FileSystemWatcher 
+					{ 
+						public System.Object Tag; 
+					}
+				}
+				"
+			
+			local csharpProvider = DotNetObject "Microsoft.CSharp.CSharpCodeProvider"
+			local compilerParams = DotNetObject "System.CodeDom.Compiler.CompilerParameters"
+			compilerParams.ReferencedAssemblies.Add("System.dll");
+			compilerParams.GenerateInMemory = true
+			
+			local compilerResults = csharpProvider.CompileAssemblyFromSource compilerParams #(source)
+			
+			return compilerResults.CompiledAssembly.CreateInstance "MXS.FileSystemWatcher"
+		),
+		
+		
 		private
 		function initFileSystemWatcher =
 		(
@@ -205,11 +145,77 @@
 			
 			_watcher.NotifyFilter = _watcher.NotifyFilter.LastWrite
 			
-			DotNet.addEventHandler _watcher "Changed" onChanged
-			DotNet.addEventHandler _watcher "Deleted" onChanged
-			DotNet.addEventHandler _watcher "Renamed" onChanged
+			DotNet.addEventHandler _watcher "Changed" watcher_OnChanged
+			DotNet.addEventHandler _watcher "Deleted" watcher_OnChanged
+			DotNet.addEventHandler _watcher "Renamed" watcher_OnChanged
 			
 			_watcher.EnableRaisingEvents = true
+		),
+		
+		
+		private
+		function castValue val config =
+		(
+			local castedVal
+			try (castedVal = val as (config.type)) catch ()
+			
+			if castedVal == undefined then (
+				castedVal = config.default
+				
+				local pattern = "<MaxSpotlight> Setting '%' with value '%' couldn't be cast to %. " +
+					"Using default: %. Check your setting file.\n"
+				format pattern (config.name as String) val config.type config.default
+			)
+			
+			return castedVal
+		),
+		
+		
+		private
+		function setConfigValue inKey inVal =
+		(
+			setINISetting _configPath _sectionName inKey (inVal as String)
+		),
+		
+		
+		
+		private
+		function isSet val =
+		(
+			return val != ""
+		),
+		
+		
+		private
+		function getConfigFromINI inKey =
+		(
+			return getINISetting _configPath _sectionName inKey
+		),
+		
+		
+		public
+		function init =
+		(
+			for settingOn in _settings do (
+				local val = getConfigFromINI settingOn.name
+				
+				if not isSet val then (
+					val = settingOn.default
+					setConfigValue settingOn.name val
+				)
+				
+				local castedVal = castValue val settingOn				
+				settingOn.val = castedVal
+			)
+			
+			_valid = true
+		),
+		
+		
+		private
+		function getConfigPath inConfigDir =
+		(
+			return PathConfig.appendPath inConfigDir _configFilename
 		),
 		
 		
@@ -219,7 +225,7 @@
 				throw "Exception on construction. Directory doesn't exist: " inConfigDir
 			
 			_configDir = inConfigDir
-			_configPath = getConfigPath()			
+			_configPath = getConfigPath _configDir		
 			
 			init()
 			initFileSystemWatcher()

@@ -9,12 +9,7 @@
  */
 
 (
-	-- Version 1.7.1
-
-	try(::maxSpotlight.destroy()) catch()
-	
 	local GUIWrapper = fileIn @"gui.ms"
-	global maxSpotlight = GUIWrapper()
-	
-	::maxSpotlight.create()
+	local gui = GUIWrapper.getInstance()
+	gui.create()
 )

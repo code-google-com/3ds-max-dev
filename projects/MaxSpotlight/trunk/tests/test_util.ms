@@ -14,7 +14,7 @@
 		function assertListenerText expectedText =
 		(
 			local listenerText = testHelper.getListenerText()
-			Assert2.equals listenerText expectedText
+			assert2.equals listenerText expectedText
 		),
 		
 		
@@ -45,10 +45,10 @@
 		public
 		function assertArray assertedArray expectedArray =
 		(
-			Assert2.equals assertedArray.count expectedArray.count
+			assert2.equals assertedArray.count expectedArray.count
 			
 			for i=1 to expectedArray.count do
-				Assert2.assertTrue (findItem assertedArray expectedArray[i] != 0)
+				assert2.assertTrue (findItem assertedArray expectedArray[i] != 0)
 		),
 		
 		
@@ -186,13 +186,27 @@
 		function test_getNodeNamesWithExactOrPatternMatch_noNodes =
 		(
 			local nodeNames =_util.getNodeNamesWithExactOrPatternMatch "nodeNotExist"
-			Assert2.equals nodeNames.count 0
+			assert2.equals nodeNames.count 0
 		),
 		
 		
 		function test_getNodeNamesWithExactOrPatternMatch_oneNodeExactMatch =
 		(
 			local nodeNames =_util.getNodeNamesWithExactOrPatternMatch "abc"
+			assertHelper.assertArray nodeNames #(_node.name)
+		),
+		
+		
+		function test_getNodeNamesWithExactOrPatternMatch_oneNodeExactMatchPlusWildcard_regression =
+		(
+			local nodeNames =_util.getNodeNamesWithExactOrPatternMatch "abc*"
+			assertHelper.assertArray nodeNames #(_node.name)
+		),
+		
+		
+		function test_getNodeNamesWithExactOrPatternMatch_fullNameAndLeadingAndTrailingWildcard =
+		(
+			local nodeNames =_util.getNodeNamesWithExactOrPatternMatch "*abc*"
 			assertHelper.assertArray nodeNames #(_node.name)
 		),
 		
@@ -229,7 +243,7 @@
 		function test_selectNodes_noNodes =
 		(
 			local nodes =_util.selectNodes "nodeNotExist"
-			Assert2.equals nodes.count 0
+			assert2.equals nodes.count 0
 		),
 		
 		
@@ -293,7 +307,7 @@
 			_util.selectNodesAndLog "nodeNotExist"
 			
 			assertHelper.assertlogSelectedNumNodesText 0
-			Assert2.equals selection.count 0
+			assert2.equals selection.count 0
 		),
 		
 		
