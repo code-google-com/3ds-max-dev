@@ -244,8 +244,7 @@
 			 */
 			
 			runAllTests()
-			
-			this._results
+			return _results
 		)
 	)
 )
