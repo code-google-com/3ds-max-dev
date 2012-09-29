@@ -122,10 +122,17 @@
 				)
 				
 				
+				function _changeToMaxColor &inControlProperty inColorID =
+				(
+					local col = (colorMan.getColor inColorID) * 255
+					inControlProperty = inControlProperty.FromARGB col[1] col[2] col[3]
+				)
+				
+				
 				function _initSelectField =
 				(
-					local bgCol = colorMan.getColor #window * 255
-					dncSelectField.BackColor = dncSelectField.BackColor.FromARGB bgCol[1] bgCol[2] bgCol[3]
+					_changeToMaxColor &dncSelectField.BackColor #window
+					_changeToMaxColor &dncSelectField.ForeColor #text
 					
 					dncSelectField.AcceptsTab = false
 					dncSelectField.AllowDrop = true
