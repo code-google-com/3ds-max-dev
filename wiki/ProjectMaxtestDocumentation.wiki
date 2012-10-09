@@ -199,6 +199,9 @@ Keyword `structPattern` doesn't take any wildcards, so Pattern is a bad name.
 
 *<br/>*
 = Roadmap =
+== PreAndPost Events after running a test and entire suite ==
+ * in post event containing the test results
+
 == assert message being added to the `MaxTestResult` ==
 
 == Implement profiling for tests ==
