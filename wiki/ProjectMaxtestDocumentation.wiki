@@ -199,12 +199,12 @@ Keyword `structPattern` doesn't take any wildcards, so Pattern is a bad name.
 
 *<br/>*
 = Roadmap =
-== PreAndPost Events after running a test and entire suite ==
+== `PreAndPost` Events after running a test and entire suite ==
  * in post event containing the test results
 
 == assert message being added to the `MaxTestResult` ==
 
-== DirCrawler ==
+== `DirCrawler` ==
 * file, struct and function patterns to find tests must be case insensitive
 
 == Implement profiling for tests ==
