@@ -95,6 +95,7 @@ I now can double click to select the node name and drag & drop them over to `Max
 = Roadmap =
 Ideas for the next versions.
  * `with undo on`, to preserve previous selections
+ * Allow RegEx
 
 *<br/>*
 = External links =
