@@ -199,6 +199,8 @@ Keyword `structPattern` doesn't take any wildcards, so Pattern is a bad name.
 
 *<br/>*
 = Roadmap =
+== Try Catch for the DirCrawler, to return a more meaningful error msg or to continue getting an instance of the other tests
+
 == !PreAndPost Events after running a test and entire suite ==
  * in post event containing the test results
 
