@@ -1,0 +1,89 @@
+# Description #
+Tool for selecting and finding objects by name with a quick and spotlight-like search behavior.
+
+![http://3ds-max-dev.googlecode.com/svn/wiki/images/projects/MaxSpotlight/gui.png](http://3ds-max-dev.googlecode.com/svn/wiki/images/projects/MaxSpotlight/gui.png)
+
+![http://3ds-max-dev.googlecode.com/svn/wiki/images/projects/MaxSpotlight/result.png](http://3ds-max-dev.googlecode.com/svn/wiki/images/projects/MaxSpotlight/result.png)
+
+<br />**# Requirements #
+Tested with:
+3ds max 2011/2012 (64bit)**
+
+<br />**# Install #**Recommended
+
+  1. Place the `run.ms` inside the startup folder`*`
+  1. Start Max
+> <sup>* C:\Program Files\Autodesk\3ds Max 2011\Scripts\Startup</sup>
+
+**Standard**
+  1. Copy the `MaxSpotlight` folder into a diretory of your choice
+  1. Choose from the Menu Bar MAXScript and then _Run script..._
+  1. Browse to and open the run.ms
+
+<br />**# How to use #**
+
+
+**3Ds Max - Typing**
+  1. Open the Listener to see search results
+  1. Type into the text box
+  1. All objects which include the string will be listed
+  1. Press Enter to select all listed objects
+
+**3Ds Max - Drag & Drop**
+  1. You can drag text into the text box
+  1. If an object matches the string, it will be selected.
+
+**General**
+  * Entry supports wild cards. (e.g.: Sph\*re)
+  * on an exact match it will always select it
+> e.g.: you have two nodes _sphere01_ and _sphere01a_ and enter "sphere01", it won’t select both objects, only the one matching exactly the object name
+  * if multiple nodes have the same name and you type an exact match, both nodes are selected
+> e.g.: you have three nodes _sphere01_, _sphere01_ and _sphere01a_ and enter "sphere01", it will select both nodes _sphere01_, but not _sphere01a_
+
+<br />**# Properties #
+You can configure `MaxSpotlight`s behavior to your needs by altering the `MaxSpotlight.ini`.
+Press the "C" button in the GUI to get it open.**
+
+**defaultText** (default `MaxSpotlight*`)
+> Default text displayed inside the textBox until you make an entry
+
+**autoSelect** (default false)
+> Select while typing
+
+**clearListener** (default true)
+> Clear the Listener after every change of textBox input
+
+**showNames** (default true)
+> Output all found object names
+
+**showCount** (default true)
+> Output count of found objects
+
+**showSelectCount** (default true)
+> Output count of selected objects
+
+**lostFocusSelect** (default false)
+> When clicking outside the textBox, it selects
+
+**silentOnDrop** (default true)
+> When drag&drop a string into the text box, don’t clear Listener and don’t show names, count and selectCount
+
+**typingTimerInMs** (default 300)
+> Delays the printing to listener if your last pressed key is was typed within a certain time.
+> Give it a value of 0 if you don't want to wait.
+
+**lineLimit** (default 100)
+> Limits the number of found nodes printed to the listener.
+> 0 will deactivate the limit.
+
+<br />**# Last thoughts #
+Handy tool and time saver if you have an node naming convention established.
+Some tools I use, print node names to the listener.
+I now can double click to select the node name and drag & drop them over to `MaxSpotlight` to select the node**
+
+<br />**# Roadmap #
+Ideas for the next versions.
+  * `with undo on`, to preserve previous selections
+  * Allow RegEx**
+
+<br />
